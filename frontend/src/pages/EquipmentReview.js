@@ -35,6 +35,7 @@ export default function EquipmentReview() {
   const [selectedTechnician, setSelectedTechnician] = useState("");
   const [newTechnician, setNewTechnician] = useState("");
   const [loading, setLoading] = useState(false);
+  const [technicianDialogOpen, setTechnicianDialogOpen] = useState(false);
 
   useEffect(() => {
     loadTechnicians();
