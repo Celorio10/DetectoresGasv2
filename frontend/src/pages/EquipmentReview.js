@@ -349,7 +349,7 @@ export default function EquipmentReview() {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Dialog>
+                    <Dialog open={technicianDialogOpen} onOpenChange={setTechnicianDialogOpen}>
                       <DialogTrigger asChild>
                         <Button type="button" variant="outline" size="icon" data-testid="add-technician-button">
                           <Plus className="w-4 h-4" />
