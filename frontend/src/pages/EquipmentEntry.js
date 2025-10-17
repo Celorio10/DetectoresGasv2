@@ -34,6 +34,9 @@ export default function EquipmentEntry() {
   const [newModel, setNewModel] = useState("");
   const [newClient, setNewClient] = useState({ name: "", cif: "" });
   const [loading, setLoading] = useState(false);
+  const [brandDialogOpen, setBrandDialogOpen] = useState(false);
+  const [modelDialogOpen, setModelDialogOpen] = useState(false);
+  const [clientDialogOpen, setClientDialogOpen] = useState(false);
 
   useEffect(() => {
     loadData();
