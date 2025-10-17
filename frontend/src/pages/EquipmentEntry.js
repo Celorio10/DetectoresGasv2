@@ -194,7 +194,7 @@ export default function EquipmentEntry() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Dialog>
+                  <Dialog open={modelDialogOpen} onOpenChange={setModelDialogOpen}>
                     <DialogTrigger asChild>
                       <Button type="button" variant="outline" size="icon" data-testid="add-model-button">
                         <Plus className="w-4 h-4" />
