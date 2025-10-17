@@ -63,7 +63,7 @@ export default function EquipmentEntry() {
     // Cerrar el modal primero
     setBrandDialogOpen(false);
     
-    // Pequeño delay para asegurar que el modal se cierra
+    // Delay más largo para asegurar que el modal y overlay se cierran completamente
     setTimeout(async () => {
       try {
         await axios.post(`${API}/brands`, { name: newBrand }, getAuthHeaders());
@@ -73,7 +73,7 @@ export default function EquipmentEntry() {
       } catch (error) {
         toast.error(error.response?.data?.detail || 'Error al añadir marca');
       }
-    }, 100);
+    }, 300);
   };
 
   const handleAddModel = async () => {
@@ -82,7 +82,7 @@ export default function EquipmentEntry() {
     // Cerrar el modal primero
     setModelDialogOpen(false);
     
-    // Pequeño delay para asegurar que el modal se cierra
+    // Delay más largo para asegurar que el modal y overlay se cierran completamente
     setTimeout(async () => {
       try {
         await axios.post(`${API}/models`, { name: newModel }, getAuthHeaders());
@@ -92,7 +92,7 @@ export default function EquipmentEntry() {
       } catch (error) {
         toast.error(error.response?.data?.detail || 'Error al añadir modelo');
       }
-    }, 100);
+    }, 300);
   };
 
   const handleAddClient = async () => {
@@ -101,7 +101,7 @@ export default function EquipmentEntry() {
     // Cerrar el modal primero
     setClientDialogOpen(false);
     
-    // Pequeño delay para asegurar que el modal se cierra
+    // Delay más largo para asegurar que el modal y overlay se cierran completamente
     setTimeout(async () => {
       try {
         await axios.post(`${API}/clients`, newClient, getAuthHeaders());
@@ -111,7 +111,7 @@ export default function EquipmentEntry() {
       } catch (error) {
         toast.error(error.response?.data?.detail || 'Error al añadir cliente');
       }
-    }, 100);
+    }, 300);
   };
 
   const handleSubmit = async (e) => {
