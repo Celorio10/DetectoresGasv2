@@ -156,7 +156,7 @@ export default function EquipmentEntry() {
                       ))}
                     </SelectContent>
                   </Select>
-                  <Dialog>
+                  <Dialog open={brandDialogOpen} onOpenChange={setBrandDialogOpen}>
                     <DialogTrigger asChild>
                       <Button type="button" variant="outline" size="icon" data-testid="add-brand-button">
                         <Plus className="w-4 h-4" />
