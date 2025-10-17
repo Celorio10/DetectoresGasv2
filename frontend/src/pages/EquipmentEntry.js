@@ -63,6 +63,7 @@ export default function EquipmentEntry() {
       await axios.post(`${API}/brands`, { name: newBrand }, getAuthHeaders());
       toast.success('Marca añadida');
       setNewBrand("");
+      setBrandDialogOpen(false);
       loadData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al añadir marca');
@@ -75,6 +76,7 @@ export default function EquipmentEntry() {
       await axios.post(`${API}/models`, { name: newModel }, getAuthHeaders());
       toast.success('Modelo añadido');
       setNewModel("");
+      setModelDialogOpen(false);
       loadData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al añadir modelo');
@@ -87,6 +89,7 @@ export default function EquipmentEntry() {
       await axios.post(`${API}/clients`, newClient, getAuthHeaders());
       toast.success('Cliente añadido');
       setNewClient({ name: "", cif: "" });
+      setClientDialogOpen(false);
       loadData();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al añadir cliente');
