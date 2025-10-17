@@ -233,7 +233,7 @@ export default function EquipmentEntry() {
                     ))}
                   </SelectContent>
                 </Select>
-                <Dialog>
+                <Dialog open={clientDialogOpen} onOpenChange={setClientDialogOpen}>
                   <DialogTrigger asChild>
                     <Button type="button" variant="outline" size="icon" data-testid="add-client-button">
                       <Plus className="w-4 h-4" />
