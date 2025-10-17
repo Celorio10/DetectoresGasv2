@@ -59,41 +59,59 @@ export default function EquipmentEntry() {
 
   const handleAddBrand = async () => {
     if (!newBrand.trim()) return;
-    try {
-      await axios.post(`${API}/brands`, { name: newBrand }, getAuthHeaders());
-      toast.success('Marca añadida');
-      setNewBrand("");
-      setBrandDialogOpen(false);
-      loadData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al añadir marca');
-    }
+    
+    // Cerrar el modal primero
+    setBrandDialogOpen(false);
+    
+    // Pequeño delay para asegurar que el modal se cierra
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/brands`, { name: newBrand }, getAuthHeaders());
+        toast.success('Marca añadida');
+        setNewBrand("");
+        loadData();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir marca');
+      }
+    }, 100);
   };
 
   const handleAddModel = async () => {
     if (!newModel.trim()) return;
-    try {
-      await axios.post(`${API}/models`, { name: newModel }, getAuthHeaders());
-      toast.success('Modelo añadido');
-      setNewModel("");
-      setModelDialogOpen(false);
-      loadData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al añadir modelo');
-    }
+    
+    // Cerrar el modal primero
+    setModelDialogOpen(false);
+    
+    // Pequeño delay para asegurar que el modal se cierra
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/models`, { name: newModel }, getAuthHeaders());
+        toast.success('Modelo añadido');
+        setNewModel("");
+        loadData();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir modelo');
+      }
+    }, 100);
   };
 
   const handleAddClient = async () => {
     if (!newClient.name.trim() || !newClient.cif.trim()) return;
-    try {
-      await axios.post(`${API}/clients`, newClient, getAuthHeaders());
-      toast.success('Cliente añadido');
-      setNewClient({ name: "", cif: "" });
-      setClientDialogOpen(false);
-      loadData();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al añadir cliente');
-    }
+    
+    // Cerrar el modal primero
+    setClientDialogOpen(false);
+    
+    // Pequeño delay para asegurar que el modal se cierra
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/clients`, newClient, getAuthHeaders());
+        toast.success('Cliente añadido');
+        setNewClient({ name: "", cif: "" });
+        loadData();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir cliente');
+      }
+    }, 100);
   };
 
   const handleSubmit = async (e) => {
