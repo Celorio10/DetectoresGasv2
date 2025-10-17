@@ -104,6 +104,7 @@ export default function EquipmentReview() {
       await axios.post(`${API}/technicians`, { name: newTechnician }, getAuthHeaders());
       toast.success('Técnico añadido');
       setNewTechnician("");
+      setTechnicianDialogOpen(false);
       loadTechnicians();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al añadir técnico');
