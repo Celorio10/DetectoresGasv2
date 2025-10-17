@@ -100,15 +100,21 @@ export default function EquipmentReview() {
 
   const handleAddTechnician = async () => {
     if (!newTechnician.trim()) return;
-    try {
-      await axios.post(`${API}/technicians`, { name: newTechnician }, getAuthHeaders());
-      toast.success('Técnico añadido');
-      setNewTechnician("");
-      setTechnicianDialogOpen(false);
-      loadTechnicians();
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al añadir técnico');
-    }
+    
+    // Cerrar el modal primero
+    setTechnicianDialogOpen(false);
+    
+    // Pequeño delay para asegurar que el modal se cierra
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/technicians`, { name: newTechnician }, getAuthHeaders());
+        toast.success('Técnico añadido');
+        setNewTechnician("");
+        loadTechnicians();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir técnico');
+      }
+    }, 100);
   };
 
   const handleSubmit = async (e) => {
