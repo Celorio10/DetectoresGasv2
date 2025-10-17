@@ -104,7 +104,7 @@ export default function EquipmentReview() {
     // Cerrar el modal primero
     setTechnicianDialogOpen(false);
     
-    // Pequeño delay para asegurar que el modal se cierra
+    // Delay más largo para asegurar que el modal y overlay se cierran completamente
     setTimeout(async () => {
       try {
         await axios.post(`${API}/technicians`, { name: newTechnician }, getAuthHeaders());
@@ -114,7 +114,7 @@ export default function EquipmentReview() {
       } catch (error) {
         toast.error(error.response?.data?.detail || 'Error al añadir técnico');
       }
-    }, 100);
+    }, 300);
   };
 
   const handleSubmit = async (e) => {
