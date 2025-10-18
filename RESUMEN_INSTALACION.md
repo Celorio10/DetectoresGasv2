@@ -143,6 +143,7 @@ Sigue la guía paso a paso con todos los comandos explicados.
 | `README_GITHUB.md` | Guía instalación desde GitHub | Opción 1 |
 | `README_INSTALACION.md` | Guía instalación local | Opción 2 |
 | `GUIA_DESPLIEGUE.md` | Guía manual completa | Opción 3 |
+| `README_RESET_DB.md` | Guía limpieza de base de datos | Después de pruebas |
 | `RESUMEN_INSTALACION.md` | Este archivo (resumen) | Empezar aquí |
 
 ---
