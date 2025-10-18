@@ -276,6 +276,11 @@ async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate
     updated = await db.equipment.find_one({"serial_number": serial_number}, {"_id": 0})
     return updated
 
+@api_router.get("/equipment/pending", response_model=List[Equipment])
+async def get_pending_equipment(current_user: dict = Depends(get_current_user)):
+    equipment = await db.equipment.find({"status": "pending"}, {"_id": 0}).to_list(1000)
+    return equipment
+
 @api_router.get("/equipment/calibrated", response_model=List[Equipment])
 async def get_calibrated_equipment(current_user: dict = Depends(get_current_user)):
     equipment = await db.equipment.find({"status": "calibrated"}, {"_id": 0}).to_list(1000)
