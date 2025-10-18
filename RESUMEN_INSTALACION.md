@@ -317,6 +317,27 @@ Una vez instalado:
 
 ---
 
+## 🗑️ Limpiar Base de Datos
+
+### Después de Pruebas
+
+Cuando termines de probar y quieras empezar con datos limpios:
+
+```bash
+sudo bash reset-database.sh
+```
+
+**Opciones disponibles:**
+1. Vaciar TODO (reset completo)
+2. Vaciar datos de trabajo (⭐ recomendado para producción)
+3. Vaciar solo equipos
+4. Reset completo + reinicializar
+5. Restaurar desde backup
+
+📖 **Documentación:** Ver `README_RESET_DB.md`
+
+---
+
 ## 💡 Tips Importantes
 
 ### Seguridad
