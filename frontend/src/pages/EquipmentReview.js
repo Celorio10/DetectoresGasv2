@@ -235,6 +235,70 @@ export default function EquipmentReview() {
           </div>
         </div>
 
+        {/* Pending Equipment Table */}
+        {!equipment && pendingEquipment.length > 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+            <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
+              Equipos Pendientes de Revisión ({pendingEquipment.length})
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Selecciona un equipo de la lista para comenzar la revisión
+            </p>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b bg-gray-50">
+                    <th className="text-left p-3 text-sm font-semibold">Marca</th>
+                    <th className="text-left p-3 text-sm font-semibold">Modelo</th>
+                    <th className="text-left p-3 text-sm font-semibold">Cliente</th>
+                    <th className="text-left p-3 text-sm font-semibold">Número de Serie</th>
+                    <th className="text-left p-3 text-sm font-semibold">Fecha Entrada</th>
+                    <th className="text-center p-3 text-sm font-semibold">Acción</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pendingEquipment.map((item) => (
+                    <tr 
+                      key={item.id} 
+                      className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                      onClick={() => handleSelectEquipment(item)}
+                    >
+                      <td className="p-3" data-testid={`pending-brand-${item.serial_number}`}>{item.brand}</td>
+                      <td className="p-3">{item.model}</td>
+                      <td className="p-3">{item.client_name}</td>
+                      <td className="p-3 font-semibold text-blue-600" data-testid={`pending-serial-${item.serial_number}`}>
+                        {item.serial_number}
+                      </td>
+                      <td className="p-3 text-sm text-gray-600">{item.entry_date}</td>
+                      <td className="p-3 text-center">
+                        <Button 
+                          size="sm" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectEquipment(item);
+                          }}
+                          data-testid={`select-equipment-${item.serial_number}`}
+                          className="bg-green-600 hover:bg-green-700"
+                        >
+                          Seleccionar
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {!equipment && pendingEquipment.length === 0 && (
+          <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 mb-6 text-center">
+            <p className="text-gray-600" data-testid="no-pending-equipment">
+              No hay equipos pendientes de revisión
+            </p>
+          </div>
+        )}
+
         {/* Equipment Info */}
         {equipment && (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 mb-6" data-testid="equipment-info">
