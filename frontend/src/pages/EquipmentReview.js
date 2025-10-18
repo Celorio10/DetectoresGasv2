@@ -22,6 +22,8 @@ export default function EquipmentReview() {
   const [searchSerial, setSearchSerial] = useState("");
   const [equipment, setEquipment] = useState(null);
   const [technicians, setTechnicians] = useState([]);
+  const [pendingEquipment, setPendingEquipment] = useState([]);
+  const [selectedEquipmentId, setSelectedEquipmentId] = useState(null);
   const [calibrationData, setCalibrationData] = useState([{
     sensor: "",
     pre_alarm: "",
@@ -39,6 +41,7 @@ export default function EquipmentReview() {
 
   useEffect(() => {
     loadTechnicians();
+    loadPendingEquipment();
   }, []);
 
   const loadTechnicians = async () => {
@@ -47,6 +50,15 @@ export default function EquipmentReview() {
       setTechnicians(response.data);
     } catch (error) {
       toast.error('Error al cargar técnicos');
+    }
+  };
+
+  const loadPendingEquipment = async () => {
+    try {
+      const response = await axios.get(`${API}/equipment/pending`, getAuthHeaders());
+      setPendingEquipment(response.data);
+    } catch (error) {
+      toast.error('Error al cargar equipos pendientes');
     }
   };
 
