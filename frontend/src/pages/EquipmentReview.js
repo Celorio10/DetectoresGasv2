@@ -70,6 +70,7 @@ export default function EquipmentReview() {
     try {
       const response = await axios.get(`${API}/equipment/serial/${searchSerial}`, getAuthHeaders());
       setEquipment(response.data);
+      setSelectedEquipmentId(response.data.id);
       
       // Si ya tiene datos de calibración, cargarlos
       if (response.data.calibration_data && response.data.calibration_data.length > 0) {
@@ -78,6 +79,42 @@ export default function EquipmentReview() {
         setCalibrationDate(response.data.calibration_date || new Date().toISOString().split('T')[0]);
         setSelectedTechnician(response.data.technician || "");
       }
+      
+      toast.success('Equipo encontrado');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Equipo no encontrado');
+      setEquipment(null);
+    }
+  };
+
+  const handleSelectEquipment = (selectedEquip) => {
+    setEquipment(selectedEquip);
+    setSelectedEquipmentId(selectedEquip.id);
+    setSearchSerial(selectedEquip.serial_number);
+    
+    // Si ya tiene datos de calibración, cargarlos
+    if (selectedEquip.calibration_data && selectedEquip.calibration_data.length > 0) {
+      setCalibrationData(selectedEquip.calibration_data);
+      setSpareParts(selectedEquip.spare_parts || "");
+      setCalibrationDate(selectedEquip.calibration_date || new Date().toISOString().split('T')[0]);
+      setSelectedTechnician(selectedEquip.technician || "");
+    } else {
+      // Reset calibration data para nuevo equipo
+      setCalibrationData([{
+        sensor: "",
+        pre_alarm: "",
+        alarm: "",
+        calibration_value: "",
+        calibration_bottle: "",
+        approved: false
+      }]);
+      setSpareParts("");
+      setCalibrationDate(new Date().toISOString().split('T')[0]);
+      setSelectedTechnician("");
+    }
+    
+    toast.success('Equipo seleccionado');
+  };
       
       toast.success('Equipo encontrado');
     } catch (error) {
