@@ -186,6 +186,7 @@ export default function EquipmentReview() {
       // Reset
       setEquipment(null);
       setSearchSerial("");
+      setSelectedEquipmentId(null);
       setCalibrationData([{
         sensor: "",
         pre_alarm: "",
@@ -196,6 +197,8 @@ export default function EquipmentReview() {
       }]);
       setSpareParts("");
       setSelectedTechnician("");
+      // Recargar lista de equipos pendientes
+      loadPendingEquipment();
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al calibrar equipo');
     } finally {
