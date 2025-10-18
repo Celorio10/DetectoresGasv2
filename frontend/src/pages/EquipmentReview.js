@@ -115,13 +115,6 @@ export default function EquipmentReview() {
     
     toast.success('Equipo seleccionado');
   };
-      
-      toast.success('Equipo encontrado');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Equipo no encontrado');
-      setEquipment(null);
-    }
-  };
 
   const handleAddRow = () => {
     if (calibrationData.length < 6) {
