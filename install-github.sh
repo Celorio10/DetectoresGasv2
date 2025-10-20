@@ -134,10 +134,35 @@ install_nodejs() {
 install_mongodb() {
     print_header "Verificando MongoDB"
     
-    # Verificar si MongoDB ya está instalado
+    # Verificar si MongoDB está en Docker
+    if command -v docker &> /dev/null; then
+        if docker ps | grep -q mongo; then
+            print_success "MongoDB detectado en Docker"
+            
+            # Verificar que el puerto 27017 está accesible
+            if nc -z localhost 27017 2>/dev/null || timeout 2 bash -c 'cat < /dev/null > /dev/tcp/localhost/27017' 2>/dev/null; then
+                print_success "MongoDB accesible en puerto 27017"
+                
+                # Configurar contenedor para auto-inicio
+                MONGO_CONTAINER=$(docker ps --filter "ancestor=mongo" --format "{{.Names}}" | head -1)
+                if [ ! -z "$MONGO_CONTAINER" ]; then
+                    docker update --restart unless-stopped "$MONGO_CONTAINER" > /dev/null 2>&1
+                    print_success "MongoDB configurado para auto-inicio"
+                fi
+                
+                return
+            else
+                print_error "MongoDB en Docker no está accesible en puerto 27017"
+                print_info "Verifica que el contenedor expone el puerto: docker ps"
+                exit 1
+            fi
+        fi
+    fi
+    
+    # Verificar si MongoDB está instalado nativamente
     if command -v mongod &> /dev/null; then
         MONGO_VERSION=$(mongod --version | head -1 || echo "desconocida")
-        print_info "MongoDB ya está instalado: $MONGO_VERSION"
+        print_info "MongoDB instalado nativamente: $MONGO_VERSION"
         
         # Verificar si está corriendo
         if systemctl is-active --quiet mongod; then
@@ -160,10 +185,18 @@ install_mongodb() {
         fi
     fi
     
-    # Si no está instalado, mostrar mensaje
+    # Si no está instalado de ninguna forma
     print_error "MongoDB no está instalado"
     print_info "La aplicación requiere MongoDB para funcionar"
-    print_info "Instala MongoDB manualmente con una versión compatible con tu CPU"
+    print_info ""
+    print_info "Opciones:"
+    print_info "1. Instalar en Docker (recomendado para CPUs sin AVX):"
+    print_info "   sudo docker pull mongo:4.4"
+    print_info "   sudo docker run -d --name mongodb --restart unless-stopped -p 27017:27017 mongo:4.4"
+    print_info ""
+    print_info "2. Instalar nativamente (requiere AVX):"
+    print_info "   sudo apt install mongodb-org"
+    print_info ""
     print_info "Luego vuelve a ejecutar este script"
     exit 1
 }
