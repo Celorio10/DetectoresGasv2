@@ -132,39 +132,40 @@ install_nodejs() {
 }
 
 install_mongodb() {
-    print_header "Instalando MongoDB"
+    print_header "Verificando MongoDB"
     
-    if systemctl is-active --quiet mongod; then
-        print_info "MongoDB ya está instalado y corriendo"
-        return
+    # Verificar si MongoDB ya está instalado
+    if command -v mongod &> /dev/null; then
+        MONGO_VERSION=$(mongod --version | head -1 || echo "desconocida")
+        print_info "MongoDB ya está instalado: $MONGO_VERSION"
+        
+        # Verificar si está corriendo
+        if systemctl is-active --quiet mongod; then
+            print_success "MongoDB está corriendo"
+            return
+        else
+            print_info "Iniciando MongoDB existente..."
+            systemctl start mongod
+            systemctl enable mongod >> "$LOG_FILE" 2>&1
+            sleep 3
+            
+            if systemctl is-active --quiet mongod; then
+                print_success "MongoDB iniciado correctamente"
+                return
+            else
+                print_warning "No se pudo iniciar MongoDB automáticamente"
+                print_info "Intenta iniciarlo manualmente: sudo systemctl start mongod"
+                exit 1
+            fi
+        fi
     fi
     
-    log "Instalando MongoDB 7.0..."
-    
-    # Importar clave GPG
-    curl -fsSL https://www.mongodb.org/static/pgp/server-7.0.asc | \
-        gpg -o /usr/share/keyrings/mongodb-server-7.0.gpg --dearmor >> "$LOG_FILE" 2>&1
-    
-    # Agregar repositorio
-    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-7.0.gpg ] https://repo.mongodb.org/apt/ubuntu $(lsb_release -cs)/mongodb-org/7.0 multiverse" | \
-        tee /etc/apt/sources.list.d/mongodb-org-7.0.list >> "$LOG_FILE" 2>&1
-    
-    # Actualizar e instalar
-    apt update >> "$LOG_FILE" 2>&1
-    apt install -y mongodb-org >> "$LOG_FILE" 2>&1
-    
-    # Iniciar y habilitar
-    systemctl start mongod
-    systemctl enable mongod >> "$LOG_FILE" 2>&1
-    
-    sleep 3
-    
-    if systemctl is-active --quiet mongod; then
-        print_success "MongoDB instalado y corriendo"
-    else
-        print_error "MongoDB instalado pero no está corriendo"
-        exit 1
-    fi
+    # Si no está instalado, mostrar mensaje
+    print_error "MongoDB no está instalado"
+    print_info "La aplicación requiere MongoDB para funcionar"
+    print_info "Instala MongoDB manualmente con una versión compatible con tu CPU"
+    print_info "Luego vuelve a ejecutar este script"
+    exit 1
 }
 
 install_apache() {
