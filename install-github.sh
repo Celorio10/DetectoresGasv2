@@ -92,7 +92,7 @@ install_dependencies() {
     
     log "Instalando dependencias básicas..."
     apt install -y curl wget git software-properties-common \
-        apt-transport-https ca-certificates gnupg lsb-release >> "$LOG_FILE" 2>&1
+        apt-transport-https ca-certificates gnupg lsb-release netcat-openbsd >> "$LOG_FILE" 2>&1
     print_success "Dependencias básicas instaladas"
 }
 
