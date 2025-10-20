@@ -106,6 +106,14 @@ install_python() {
         log "Instalando Python3..."
         apt install -y python3 python3-pip python3-venv python3-dev >> "$LOG_FILE" 2>&1
         print_success "Python3 instalado"
+        return
+    fi
+    
+    # Verificar que python3-venv está instalado
+    if ! dpkg -l | grep -q python3.*-venv; then
+        log "Instalando python3-venv..."
+        apt install -y python3-venv python3-pip python3-dev >> "$LOG_FILE" 2>&1
+        print_success "python3-venv instalado"
     fi
 }
 
