@@ -45,6 +45,14 @@ export default function EquipmentExit() {
     }
   };
 
+  const handleToggleExpand = (serialNumber) => {
+    if (expandedEquipment === serialNumber) {
+      setExpandedEquipment(null);
+    } else {
+      setExpandedEquipment(serialNumber);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (selectedEquipment.length === 0) {
