@@ -194,7 +194,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         return user
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except (jwt.DecodeError, jwt.InvalidTokenError, Exception) as e:
+    except (jwt.DecodeError, jwt.InvalidTokenError, Exception):
         raise HTTPException(status_code=401, detail="Invalid token")
 
 # Certificate number generation
