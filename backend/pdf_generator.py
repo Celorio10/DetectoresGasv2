@@ -28,6 +28,9 @@ def generate_certificate_pdf(equipment_data, output_path):
     elements = []
     styles = getSampleStyleSheet()
     
+    # Ancho disponible para tablas
+    available_width = 180*mm
+    
     # Header con logos
     logo_path = Path(__file__).parent / 'static' / 'logo_asconsa.png'
     
@@ -43,7 +46,7 @@ def generate_certificate_pdf(equipment_data, output_path):
         header_row.append(Paragraph("ASCONSA", styles['Heading1']))
     
     # Espacio central para número de certificado
-    cert_number = equipment_data.get('id', 'N/A')
+    cert_number = equipment_data.get('certificate_number', 'N/A')
     cert_style = ParagraphStyle(
         'CertNum',
         parent=styles['Normal'],
@@ -136,30 +139,26 @@ def generate_certificate_pdf(equipment_data, output_path):
     elements.append(Paragraph(disclaimers, legal_style))
     elements.append(Spacer(1, 3*mm))
     
-    # Tabla de Materiales Sustituidos
+    # Repuestos Utilizados (sin campos fijos)
     section_style = ParagraphStyle('Section', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold')
-    elements.append(Paragraph("MATERIALES SUSTITUIDOS", section_style))
-    elements.append(Spacer(1, 2*mm))
-    
     spare_parts = equipment_data.get('spare_parts', '')
-    materials_data = [
-        [Paragraph("<b>SENSOR:</b>", info_style), ""],
-        [Paragraph("<b>BATERIA:</b>", info_style), ""],
-        [Paragraph("<b>INDICADOR:</b>", info_style), ""],
-        [Paragraph("<b>OTROS:</b>", info_style), Paragraph(spare_parts if spare_parts else "", info_style)]
-    ]
     
-    materials_table = Table(materials_data, colWidths=[40*mm, 140*mm])
-    materials_table.setStyle(TableStyle([
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 3),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-    ]))
-    elements.append(materials_table)
-    elements.append(Spacer(1, 3*mm))
+    if spare_parts and spare_parts.strip():
+        elements.append(Paragraph("REPUESTOS UTILIZADOS", section_style))
+        elements.append(Spacer(1, 2*mm))
+        
+        spare_data = [[Paragraph(spare_parts, info_style)]]
+        spare_table = Table(spare_data, colWidths=[available_width])
+        spare_table.setStyle(TableStyle([
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        elements.append(spare_table)
+        elements.append(Spacer(1, 3*mm))
     
     # Tabla de Datos de Calibración
     elements.append(Paragraph("DATOS DE CALIBRACIÓN", section_style))
@@ -193,7 +192,9 @@ def generate_certificate_pdf(equipment_data, output_path):
             ]
             cal_rows.append(row)
         
-        cal_table = Table(cal_rows, colWidths=[35*mm, 18*mm, 18*mm, 20*mm, 18*mm, 18*mm, 25*mm, 15*mm])
+        # Calcular anchos para llenar el espacio disponible
+        col_widths = [35*mm, 18*mm, 18*mm, 20*mm, 18*mm, 18*mm, 25*mm, 15*mm]
+        cal_table = Table(cal_rows, colWidths=col_widths)
         cal_table.setStyle(TableStyle([
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
             ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
@@ -210,22 +211,23 @@ def generate_certificate_pdf(equipment_data, output_path):
     elements.append(Spacer(1, 3*mm))
     
     # Observaciones
-    elements.append(Paragraph("OBSERVACIONES", section_style))
-    elements.append(Spacer(1, 2*mm))
-    
     observations = equipment_data.get('observations', '')
-    obs_data = [[Paragraph(observations if observations else "", info_style)]]
-    obs_table = Table(obs_data, colWidths=[180*mm])
-    obs_table.setStyle(TableStyle([
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('LEFTPADDING', (0, 0), (-1, -1), 3),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 3),
-        ('TOPPADDING', (0, 0), (-1, -1), 3),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
-    ]))
-    elements.append(obs_table)
-    elements.append(Spacer(1, 5*mm))
+    if observations and observations.strip():
+        elements.append(Paragraph("OBSERVACIONES", section_style))
+        elements.append(Spacer(1, 2*mm))
+        
+        obs_data = [[Paragraph(observations, info_style)]]
+        obs_table = Table(obs_data, colWidths=[available_width])
+        obs_table.setStyle(TableStyle([
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('LEFTPADDING', (0, 0), (-1, -1), 3),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+        ]))
+        elements.append(obs_table)
+        elements.append(Spacer(1, 3*mm))
     
     # Firma del Técnico (sin supervisor)
     elements.append(Paragraph("FIRMAS Y SELLO", section_style))
