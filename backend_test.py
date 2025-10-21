@@ -307,6 +307,43 @@ class WorkshopAPITester:
         )
         return success, response
 
+    def test_download_certificate_pdf(self, serial_number):
+        """Test downloading PDF certificate for calibrated equipment"""
+        url = f"{self.base_url}/equipment/{serial_number}/certificate"
+        test_headers = {}
+        
+        if self.token:
+            test_headers['Authorization'] = f'Bearer {self.token}'
+
+        print(f"\n🔍 Testing PDF Certificate Download...")
+        print(f"   URL: {url}")
+        
+        try:
+            response = requests.get(url, headers=test_headers, timeout=30)
+            
+            if response.status_code == 200:
+                # Verify it's a PDF
+                content_type = response.headers.get('content-type', '')
+                if 'application/pdf' in content_type:
+                    # Verify PDF content is not empty
+                    if len(response.content) > 1000:  # PDF should be at least 1KB
+                        self.log_test("PDF Certificate Download", True, f"PDF generated successfully, size: {len(response.content)} bytes")
+                        return True, response.content
+                    else:
+                        self.log_test("PDF Certificate Download", False, "PDF file too small, likely corrupted")
+                        return False, None
+                else:
+                    self.log_test("PDF Certificate Download", False, f"Wrong content type: {content_type}")
+                    return False, None
+            else:
+                details = f"Expected 200, got {response.status_code}. Response: {response.text[:200]}"
+                self.log_test("PDF Certificate Download", False, details)
+                return False, None
+
+        except Exception as e:
+            self.log_test("PDF Certificate Download", False, f"Exception: {str(e)}")
+            return False, None
+
 def main():
     print("🚀 Starting FASE 1 - Workshop Management API Tests")
     print("=" * 60)
