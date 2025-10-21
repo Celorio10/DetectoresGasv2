@@ -87,6 +87,24 @@ class EquipmentCatalog(BaseModel):
     client_cif: str
     client_departamento: str = ""
     last_entry_date: str
+    last_calibration_data: Optional[List['SensorCalibration']] = None
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
+class CalibrationHistory(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    serial_number: str
+    brand: str
+    model: str
+    client_name: str
+    client_cif: str
+    client_departamento: str
+    observations: str = ""
+    entry_date: str
+    calibration_data: List['SensorCalibration']
+    spare_parts: str
+    calibration_date: str
+    technician: str
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
 
 class SensorCalibration(BaseModel):
