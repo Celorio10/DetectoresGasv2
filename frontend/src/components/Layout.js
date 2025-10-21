@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Home, FileInput, ClipboardCheck, PackageOpen, BarChart3, LogOut, Menu, X } from "lucide-react";
+import { Home, FileInput, ClipboardCheck, PackageOpen, BarChart3, History, LogOut, Menu, X } from "lucide-react";
 
 export default function Layout({ children }) {
   const navigate = useNavigate();
