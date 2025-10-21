@@ -104,6 +104,7 @@ class Equipment(BaseModel):
     model: str
     client_name: str
     client_cif: str
+    client_departamento: str = ""
     serial_number: str
     observations: str = ""
     entry_date: str
