@@ -33,7 +33,9 @@ export default function EquipmentEntry() {
   });
   const [newBrand, setNewBrand] = useState("");
   const [newModel, setNewModel] = useState("");
-  const [newClient, setNewClient] = useState({ name: "", cif: "", departamento: "" });
+  const [newClient, setNewClient] = useState({ name: "", cif: "", departamentos: [] });
+  const [newDepartamento, setNewDepartamento] = useState("");
+  const [selectedClientDepartamentos, setSelectedClientDepartamentos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [brandDialogOpen, setBrandDialogOpen] = useState(false);
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
