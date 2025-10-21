@@ -201,19 +201,20 @@ class WorkshopAPITester:
         return success
 
     def test_create_equipment(self, brand, model, client):
-        """Test creating equipment"""
-        serial_number = f"SN{datetime.now().strftime('%H%M%S')}"
+        """Test creating equipment with departamento field"""
+        serial_number = f"SN-TEST-{datetime.now().strftime('%H%M%S')}"
         equipment_data = {
             "brand": brand,
             "model": model,
             "client_name": client["name"],
             "client_cif": client["cif"],
+            "client_departamento": client["departamento"],
             "serial_number": serial_number,
-            "observations": "Test equipment",
+            "observations": "Equipo de prueba FASE 1",
             "entry_date": datetime.now().strftime('%Y-%m-%d')
         }
         success, response = self.run_test(
-            "Create Equipment",
+            "Create Equipment with Departamento",
             "POST",
             "equipment",
             200,
