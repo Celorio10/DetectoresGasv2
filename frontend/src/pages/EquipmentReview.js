@@ -107,19 +107,32 @@ export default function EquipmentReview() {
     }
   };
 
-  const handleSelectEquipment = (selectedEquip) => {
+  const handleSelectEquipment = async (selectedEquip) => {
     setEquipment(selectedEquip);
     setSelectedEquipmentId(selectedEquip.id);
     setSearchSerial(selectedEquip.serial_number);
     
-    // Si ya tiene datos de calibración, cargarlos
-    if (selectedEquip.calibration_data && selectedEquip.calibration_data.length > 0) {
-      setCalibrationData(selectedEquip.calibration_data);
-      setSpareParts(selectedEquip.spare_parts || "");
-      setCalibrationDate(selectedEquip.calibration_date || new Date().toISOString().split('T')[0]);
-      setSelectedTechnician(selectedEquip.technician || "");
-    } else {
-      // Reset calibration data para nuevo equipo
+    // Cargar sensores de la última calibración desde el catálogo
+    try {
+      const catalogResponse = await axios.get(`${API}/equipment-catalog/serial/${selectedEquip.serial_number}`, getAuthHeaders());
+      if (catalogResponse.data && catalogResponse.data.last_calibration_data && catalogResponse.data.last_calibration_data.length > 0) {
+        setCalibrationData(catalogResponse.data.last_calibration_data);
+        toast.info('Sensores de última calibración cargados');
+      } else {
+        // Reset calibration data para nuevo equipo
+        setCalibrationData([{
+          sensor: "",
+          pre_alarm: "",
+          alarm: "",
+          calibration_value: "",
+          valor_zero: "",
+          valor_span: "",
+          calibration_bottle: "",
+          approved: false
+        }]);
+      }
+    } catch (catalogError) {
+      // Si no hay datos en catálogo, iniciar con tabla vacía
       setCalibrationData([{
         sensor: "",
         pre_alarm: "",
@@ -130,10 +143,12 @@ export default function EquipmentReview() {
         calibration_bottle: "",
         approved: false
       }]);
-      setSpareParts("");
-      setCalibrationDate(new Date().toISOString().split('T')[0]);
-      setSelectedTechnician("");
     }
+    
+    // Reset otros campos para nueva calibración
+    setSpareParts("");
+    setCalibrationDate(new Date().toISOString().split('T')[0]);
+    setSelectedTechnician("");
     
     toast.success('Equipo seleccionado');
   };
