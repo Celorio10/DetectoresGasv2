@@ -127,7 +127,18 @@ export default function EquipmentReview() {
     try {
       const catalogResponse = await axios.get(`${API}/equipment-catalog/serial/${selectedEquip.serial_number}`, getAuthHeaders());
       if (catalogResponse.data && catalogResponse.data.last_calibration_data && catalogResponse.data.last_calibration_data.length > 0) {
-        setCalibrationData(catalogResponse.data.last_calibration_data);
+        // Solo cargar Sensor, Pre-Alarma y Alarma. SPAN, ZERO y Botella siempre vacíos
+        const sensorsWithResetFields = catalogResponse.data.last_calibration_data.map(sensor => ({
+          sensor: sensor.sensor || "",
+          pre_alarm: sensor.pre_alarm || "",
+          alarm: sensor.alarm || "",
+          calibration_value: sensor.calibration_value || "",
+          valor_zero: "",  // Siempre vacío
+          valor_span: "",  // Siempre vacío
+          calibration_bottle: "",  // Siempre vacío
+          approved: false
+        }));
+        setCalibrationData(sensorsWithResetFields);
         toast.info('Sensores de última calibración cargados');
       } else {
         // Reset calibration data para nuevo equipo
