@@ -74,13 +74,31 @@ export default function EquipmentReview() {
       setEquipment(response.data);
       setSelectedEquipmentId(response.data.id);
       
-      // Si ya tiene datos de calibración, cargarlos
-      if (response.data.calibration_data && response.data.calibration_data.length > 0) {
-        setCalibrationData(response.data.calibration_data);
-        setSpareParts(response.data.spare_parts || "");
-        setCalibrationDate(response.data.calibration_date || new Date().toISOString().split('T')[0]);
-        setSelectedTechnician(response.data.technician || "");
+      // Cargar sensores de la última calibración desde el catálogo
+      try {
+        const catalogResponse = await axios.get(`${API}/equipment-catalog/serial/${searchSerial}`, getAuthHeaders());
+        if (catalogResponse.data && catalogResponse.data.last_calibration_data && catalogResponse.data.last_calibration_data.length > 0) {
+          setCalibrationData(catalogResponse.data.last_calibration_data);
+          toast.info('Sensores de última calibración cargados');
+        }
+      } catch (catalogError) {
+        // Si no hay datos en catálogo, iniciar con tabla vacía
+        setCalibrationData([{
+          sensor: "",
+          pre_alarm: "",
+          alarm: "",
+          calibration_value: "",
+          valor_zero: "",
+          valor_span: "",
+          calibration_bottle: "",
+          approved: false
+        }]);
       }
+      
+      // Reset otros campos para nueva calibración
+      setSpareParts("");
+      setCalibrationDate(new Date().toISOString().split('T')[0]);
+      setSelectedTechnician("");
       
       toast.success('Equipo encontrado');
     } catch (error) {
