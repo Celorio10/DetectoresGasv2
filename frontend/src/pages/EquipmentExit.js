@@ -137,31 +137,118 @@ export default function EquipmentExit() {
                 <thead>
                   <tr className="border-b bg-gray-50">
                     <th className="text-left p-3 text-sm font-semibold">Seleccionar</th>
+                    <th className="text-left p-3 text-sm font-semibold">Ver Detalles</th>
                     <th className="text-left p-3 text-sm font-semibold">Nº Serie</th>
                     <th className="text-left p-3 text-sm font-semibold">Marca</th>
                     <th className="text-left p-3 text-sm font-semibold">Modelo</th>
                     <th className="text-left p-3 text-sm font-semibold">Cliente</th>
+                    <th className="text-left p-3 text-sm font-semibold">Departamento</th>
                     <th className="text-left p-3 text-sm font-semibold">Fecha Entrada</th>
                     <th className="text-left p-3 text-sm font-semibold">Técnico</th>
                   </tr>
                 </thead>
                 <tbody>
                   {equipment.map((item) => (
-                    <tr key={item.serial_number} className="border-b hover:bg-gray-50">
-                      <td className="p-3">
-                        <Checkbox
-                          checked={selectedEquipment.includes(item.serial_number)}
-                          onCheckedChange={() => handleToggleEquipment(item.serial_number)}
-                          data-testid={`select-equipment-${item.serial_number}`}
-                        />
-                      </td>
-                      <td className="p-3 font-semibold" data-testid={`serial-${item.serial_number}`}>{item.serial_number}</td>
-                      <td className="p-3">{item.brand}</td>
-                      <td className="p-3">{item.model}</td>
-                      <td className="p-3">{item.client_name}</td>
-                      <td className="p-3">{item.entry_date}</td>
-                      <td className="p-3">{item.technician}</td>
-                    </tr>
+                    <>
+                      <tr key={item.serial_number} className="border-b hover:bg-gray-50">
+                        <td className="p-3">
+                          <Checkbox
+                            checked={selectedEquipment.includes(item.serial_number)}
+                            onCheckedChange={() => handleToggleEquipment(item.serial_number)}
+                            data-testid={`select-equipment-${item.serial_number}`}
+                          />
+                        </td>
+                        <td className="p-3">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleExpand(item.serial_number)}
+                            data-testid={`expand-equipment-${item.serial_number}`}
+                          >
+                            {expandedEquipment === item.serial_number ? (
+                              <ChevronUp className="w-4 h-4" />
+                            ) : (
+                              <ChevronDown className="w-4 h-4" />
+                            )}
+                          </Button>
+                        </td>
+                        <td className="p-3 font-semibold" data-testid={`serial-${item.serial_number}`}>{item.serial_number}</td>
+                        <td className="p-3">{item.brand}</td>
+                        <td className="p-3">{item.model}</td>
+                        <td className="p-3">{item.client_name}</td>
+                        <td className="p-3">{item.client_departamento || 'N/A'}</td>
+                        <td className="p-3">{item.entry_date}</td>
+                        <td className="p-3">{item.technician}</td>
+                      </tr>
+                      {expandedEquipment === item.serial_number && (
+                        <tr className="bg-blue-50">
+                          <td colSpan="9" className="p-4">
+                            <div className="space-y-4">
+                              {/* Tabla de Calibración */}
+                              <div>
+                                <h3 className="font-bold text-sm mb-2">Datos de Calibración</h3>
+                                {item.calibration_data && item.calibration_data.length > 0 ? (
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full text-sm border">
+                                      <thead className="bg-gray-100">
+                                        <tr>
+                                          <th className="border p-2 text-left">Sensor</th>
+                                          <th className="border p-2 text-left">Pre-Alarma</th>
+                                          <th className="border p-2 text-left">Alarma</th>
+                                          <th className="border p-2 text-left">Valor Cal.</th>
+                                          <th className="border p-2 text-left">Zero</th>
+                                          <th className="border p-2 text-left">SPAN</th>
+                                          <th className="border p-2 text-left">Botella</th>
+                                          <th className="border p-2 text-center">APTO</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {item.calibration_data.map((sensor, idx) => (
+                                          <tr key={idx}>
+                                            <td className="border p-2">{sensor.sensor}</td>
+                                            <td className="border p-2">{sensor.pre_alarm}</td>
+                                            <td className="border p-2">{sensor.alarm}</td>
+                                            <td className="border p-2">{sensor.calibration_value}</td>
+                                            <td className="border p-2">{sensor.valor_zero}</td>
+                                            <td className="border p-2">{sensor.valor_span}</td>
+                                            <td className="border p-2">{sensor.calibration_bottle}</td>
+                                            <td className="border p-2 text-center">
+                                              <span className={`px-2 py-1 rounded text-xs ${sensor.approved ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                {sensor.approved ? 'SÍ' : 'NO'}
+                                              </span>
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                ) : (
+                                  <p className="text-gray-500 text-sm">No hay datos de calibración</p>
+                                )}
+                              </div>
+
+                              {/* Repuestos Utilizados */}
+                              <div>
+                                <h3 className="font-bold text-sm mb-2">Repuestos Utilizados</h3>
+                                <div className="bg-white border rounded p-3">
+                                  <p className="text-sm">{item.spare_parts || 'Ninguno'}</p>
+                                </div>
+                              </div>
+
+                              {/* Observaciones */}
+                              {item.observations && (
+                                <div>
+                                  <h3 className="font-bold text-sm mb-2">Observaciones</h3>
+                                  <div className="bg-white border rounded p-3">
+                                    <p className="text-sm">{item.observations}</p>
+                                  </div>
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </>
                   ))}
                 </tbody>
               </table>
