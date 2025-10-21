@@ -220,6 +220,55 @@ frontend:
         agent: "main"
         comment: "Campos 'valor_zero' y 'valor_span' agregados a la tabla de calibración de sensores con sus respectivos inputs"
 
+  - task: "Implementar descarga automática de certificado PDF después de calibración"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentReview.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Descarga automática de PDF implementada en handleSubmit después de calibrar equipo exitosamente"
+
+pdf:
+  - task: "Crear módulo de generación de PDF con ReportLab"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/pdf_generator.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Módulo pdf_generator.py creado con función generate_certificate_pdf que incluye logo, texto legal, tabla de sensores, datos del equipo/cliente y firmas"
+
+  - task: "Endpoint para generar y descargar certificado PDF"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint GET /api/equipment/{serial_number}/certificate creado para generar y descargar PDF de certificado de calibración"
+
+  - task: "Guardar logo de empresa ASCONSA"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/static/logo_asconsa.png"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Logo descargado y guardado en /app/backend/static/logo_asconsa.png con fondo transparente"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
