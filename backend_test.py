@@ -297,6 +297,16 @@ class WorkshopAPITester:
         )
         return success
 
+    def test_get_equipment_catalog_by_serial(self, serial_number):
+        """Test getting equipment from catalog by serial number"""
+        success, response = self.run_test(
+            "Get Equipment Catalog by Serial",
+            "GET",
+            f"equipment-catalog/serial/{serial_number}",
+            200
+        )
+        return success, response
+
 def main():
     print("🚀 Starting Workshop Management API Tests")
     print("=" * 50)
