@@ -326,12 +326,39 @@ export default function EquipmentEntry() {
                         onChange={(e) => setNewClient({...newClient, cif: e.target.value})}
                         data-testid="new-client-cif-input"
                       />
-                      <Input
-                        placeholder="Departamento"
-                        value={newClient.departamento}
-                        onChange={(e) => setNewClient({...newClient, departamento: e.target.value})}
-                        data-testid="new-client-departamento-input"
-                      />
+                      <div>
+                        <Label>Departamentos</Label>
+                        <div className="flex gap-2 mt-2">
+                          <Input
+                            placeholder="Agregar departamento"
+                            value={newDepartamento}
+                            onChange={(e) => setNewDepartamento(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDepartamentoToNewClient())}
+                            data-testid="new-departamento-input"
+                          />
+                          <Button type="button" onClick={handleAddDepartamentoToNewClient} size="icon" variant="outline">
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </div>
+                        {newClient.departamentos.length > 0 && (
+                          <div className="mt-2 space-y-1">
+                            {newClient.departamentos.map((dep, index) => (
+                              <div key={index} className="flex items-center justify-between bg-gray-100 px-3 py-2 rounded">
+                                <span className="text-sm">{dep}</span>
+                                <Button 
+                                  type="button" 
+                                  size="sm" 
+                                  variant="ghost" 
+                                  onClick={() => handleRemoveDepartamentoFromNewClient(index)}
+                                  className="h-6 px-2"
+                                >
+                                  ×
+                                </Button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <Button onClick={handleAddClient} className="w-full" data-testid="save-client-button">Guardar</Button>
                     </div>
                   </DialogContent>
