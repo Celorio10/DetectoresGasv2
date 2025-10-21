@@ -323,9 +323,10 @@ export default function EquipmentEntry() {
                   id="serial_number"
                   data-testid="serial-number-input"
                   value={formData.serial_number}
-                  onChange={(e) => setFormData({...formData, serial_number: e.target.value})}
+                  onChange={(e) => handleSerialNumberChange(e.target.value)}
                   required
                   className="mt-2"
+                  placeholder="Ingrese número de serie"
                 />
               </div>
 
