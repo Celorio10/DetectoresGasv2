@@ -189,11 +189,12 @@ export default function EquipmentEntry() {
   const handleClientSelect = (clientId) => {
     const client = clients.find(c => c.id === clientId);
     if (client) {
+      setSelectedClientDepartamentos(client.departamentos || []);
       setFormData({
         ...formData,
         client_name: client.name,
         client_cif: client.cif,
-        client_departamento: client.departamento || ""
+        client_departamento: "" // Reset department, user will select from dropdown
       });
     }
   };
