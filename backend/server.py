@@ -413,7 +413,8 @@ async def download_certificate(serial_number: str, current_user: dict = Depends(
     if not equipment:
         raise HTTPException(status_code=404, detail="Equipment not found")
     
-    if equipment.get('status') != 'calibrated':
+    # Aceptar tanto equipos calibrados como entregados
+    if equipment.get('status') not in ['calibrated', 'delivered']:
         raise HTTPException(status_code=400, detail="Equipment not calibrated yet")
     
     # Generar el PDF
