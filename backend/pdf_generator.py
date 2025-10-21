@@ -139,19 +139,35 @@ def generate_certificate_pdf(equipment_data, output_path):
     elements.append(Paragraph(disclaimers, legal_style))
     elements.append(Spacer(1, 3*mm))
     
-    # Repuestos Utilizados (sin campos fijos)
+    # Repuestos Utilizados
     section_style = ParagraphStyle('Section', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold')
-    spare_parts = equipment_data.get('spare_parts', '')
+    spare_parts = equipment_data.get('spare_parts', [])
     
-    if spare_parts and spare_parts.strip():
+    if spare_parts and len(spare_parts) > 0:
         elements.append(Paragraph("REPUESTOS UTILIZADOS", section_style))
         elements.append(Spacer(1, 2*mm))
         
-        spare_data = [[Paragraph(spare_parts, info_style)]]
-        spare_table = Table(spare_data, colWidths=[available_width])
+        # Crear tabla de repuestos
+        spare_headers = [
+            Paragraph("<b>DESCRIPCIÓN</b>", info_style),
+            Paragraph("<b>REFERENCIA</b>", info_style),
+            Paragraph("<b>GARANTÍA</b>", info_style)
+        ]
+        spare_rows = [spare_headers]
+        
+        for part in spare_parts:
+            row = [
+                Paragraph(part.get('descripcion', ''), info_style),
+                Paragraph(part.get('referencia', ''), info_style),
+                Paragraph('GARANTÍA' if part.get('garantia', False) else '', info_style)
+            ]
+            spare_rows.append(row)
+        
+        spare_table = Table(spare_rows, colWidths=[90*mm, 60*mm, 30*mm])
         spare_table.setStyle(TableStyle([
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
             ('LEFTPADDING', (0, 0), (-1, -1), 3),
             ('RIGHTPADDING', (0, 0), (-1, -1), 3),
             ('TOPPADDING', (0, 0), (-1, -1), 3),
