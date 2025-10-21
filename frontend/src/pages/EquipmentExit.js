@@ -64,6 +64,38 @@ export default function EquipmentExit() {
         getAuthHeaders()
       );
       toast.success('Equipos entregados correctamente');
+      
+      // Descargar certificados PDF para cada equipo entregado
+      for (const serialNumber of selectedEquipment) {
+        try {
+          const response = await axios.get(
+            `${API}/equipment/${serialNumber}/certificate`,
+            {
+              ...getAuthHeaders(),
+              responseType: 'blob'
+            }
+          );
+          
+          // Crear un enlace temporal para descargar el PDF
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const link = document.createElement('a');
+          link.href = url;
+          link.setAttribute('download', `Certificado_${serialNumber}_${deliveryNote}.pdf`);
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.URL.revokeObjectURL(url);
+          
+          // Pequeña pausa entre descargas para evitar problemas del navegador
+          await new Promise(resolve => setTimeout(resolve, 500));
+        } catch (pdfError) {
+          console.error(`Error descargando certificado para ${serialNumber}:`, pdfError);
+          toast.error(`Error al descargar certificado de ${serialNumber}`);
+        }
+      }
+      
+      toast.success(`${selectedEquipment.length} certificado(s) descargado(s)`);
+      
       setSelectedEquipment([]);
       setDeliveryNote("");
       setDeliveryLocation("");
