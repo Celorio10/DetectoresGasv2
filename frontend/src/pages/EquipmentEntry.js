@@ -302,6 +302,12 @@ export default function EquipmentEntry() {
                         onChange={(e) => setNewClient({...newClient, cif: e.target.value})}
                         data-testid="new-client-cif-input"
                       />
+                      <Input
+                        placeholder="Departamento"
+                        value={newClient.departamento}
+                        onChange={(e) => setNewClient({...newClient, departamento: e.target.value})}
+                        data-testid="new-client-departamento-input"
+                      />
                       <Button onClick={handleAddClient} className="w-full" data-testid="save-client-button">Guardar</Button>
                     </div>
                   </DialogContent>
