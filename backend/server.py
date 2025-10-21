@@ -395,6 +395,39 @@ async def download_certificate(serial_number: str, current_user: dict = Depends(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
 
+@api_router.get("/equipment/{serial_number}/history", response_model=List[CalibrationHistory])
+async def get_equipment_history(serial_number: str, current_user: dict = Depends(get_current_user)):
+    """Obtener historial de calibraciones de un equipo"""
+    history = await db.calibration_history.find(
+        {"serial_number": serial_number}, 
+        {"_id": 0}
+    ).sort("calibration_date", -1).to_list(1000)
+    return history
+
+@api_router.get("/equipment/history/{history_id}/certificate")
+async def download_history_certificate(history_id: str, current_user: dict = Depends(get_current_user)):
+    """Generar y descargar certificado PDF de una calibración histórica"""
+    history_entry = await db.calibration_history.find_one({"id": history_id}, {"_id": 0})
+    if not history_entry:
+        raise HTTPException(status_code=404, detail="Calibration history not found")
+    
+    # Generar el PDF
+    pdf_dir = Path(ROOT_DIR) / 'temp_pdfs'
+    pdf_dir.mkdir(exist_ok=True)
+    
+    pdf_filename = f"certificado_{history_entry['serial_number']}_{history_entry['calibration_date']}.pdf"
+    pdf_path = pdf_dir / pdf_filename
+    
+    try:
+        generate_certificate_pdf(history_entry, str(pdf_path))
+        return FileResponse(
+            path=str(pdf_path),
+            media_type='application/pdf',
+            filename=f"Certificado_{history_entry['serial_number']}_{history_entry['calibration_date']}.pdf"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
+
 @api_router.get("/equipment/calibrated", response_model=List[Equipment])
 async def get_calibrated_equipment(current_user: dict = Depends(get_current_user)):
     equipment = await db.equipment.find({"status": "calibrated"}, {"_id": 0}).to_list(1000)
