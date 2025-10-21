@@ -527,16 +527,76 @@ export default function EquipmentReview() {
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 space-y-6">
+              {/* Repuestos Utilizados */}
               <div>
-                <Label htmlFor="spare_parts">Repuestos Utilizados</Label>
-                <Textarea
-                  id="spare_parts"
-                  data-testid="spare-parts-input"
-                  value={spareParts}
-                  onChange={(e) => setSpareParts(e.target.value)}
-                  rows={3}
-                  className="mt-2"
-                />
+                <Label>Repuestos Utilizados</Label>
+                <div className="mt-2 space-y-3">
+                  {/* Agregar nuevo repuesto */}
+                  <div className="grid grid-cols-12 gap-2 items-end">
+                    <div className="col-span-5">
+                      <Input
+                        placeholder="Descripción"
+                        value={newSparePart.descripcion}
+                        onChange={(e) => setNewSparePart({...newSparePart, descripcion: e.target.value})}
+                        data-testid="spare-descripcion-input"
+                      />
+                    </div>
+                    <div className="col-span-4">
+                      <Input
+                        placeholder="Referencia"
+                        value={newSparePart.referencia}
+                        onChange={(e) => setNewSparePart({...newSparePart, referencia: e.target.value})}
+                        data-testid="spare-referencia-input"
+                      />
+                    </div>
+                    <div className="col-span-2 flex items-center gap-2">
+                      <Checkbox
+                        checked={newSparePart.garantia}
+                        onCheckedChange={(checked) => setNewSparePart({...newSparePart, garantia: checked})}
+                        data-testid="spare-garantia-checkbox"
+                      />
+                      <Label className="text-xs">Garantía</Label>
+                    </div>
+                    <div className="col-span-1">
+                      <Button type="button" size="icon" onClick={handleAddSparePart} data-testid="add-spare-button">
+                        <Plus className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  {/* Lista de repuestos agregados */}
+                  {spareParts.length > 0 && (
+                    <div className="border rounded-lg p-3 space-y-2">
+                      {spareParts.map((part, index) => (
+                        <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium">{part.descripcion}</p>
+                            <p className="text-xs text-gray-600">Ref: {part.referencia}</p>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2">
+                              <Checkbox
+                                checked={part.garantia}
+                                onCheckedChange={() => handleToggleGarantia(index)}
+                                data-testid={`spare-garantia-toggle-${index}`}
+                              />
+                              <Label className="text-xs">Garantía</Label>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => handleRemoveSparePart(index)}
+                              data-testid={`remove-spare-${index}`}
+                            >
+                              <Trash2 className="w-4 h-4 text-red-600" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
