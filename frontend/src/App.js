@@ -7,6 +7,7 @@ import EquipmentEntry from "./pages/EquipmentEntry";
 import EquipmentReview from "./pages/EquipmentReview";
 import EquipmentExit from "./pages/EquipmentExit";
 import EquipmentSummary from "./pages/EquipmentSummary";
+import EquipmentHistory from "./pages/EquipmentHistory";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
