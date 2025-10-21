@@ -109,7 +109,7 @@ export default function EquipmentEntry() {
     
     // Delay más largo para asegurar que el modal y overlay se cierran completamente
     setTimeout(async () => {
-      try:
+      try {
         await axios.post(`${API}/clients`, newClient, getAuthHeaders());
         toast.success('Cliente añadido');
         setNewClient({ name: "", cif: "", departamentos: [] });
