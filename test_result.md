@@ -285,6 +285,10 @@ test_plan:
     - "Agregar campo Departamento al formulario de cliente en EquipmentEntry"
     - "Implementar auto-completado de equipos por número de serie"
     - "Agregar columnas Valor de Zero y Valor de SPAN en tabla de calibración"
+    - "Implementar descarga automática de certificado PDF después de calibración"
+    - "Crear módulo de generación de PDF con ReportLab"
+    - "Endpoint para generar y descargar certificado PDF"
+    - "Guardar logo de empresa ASCONSA"
   stuck_tasks: []
   test_all: true
   test_priority: "high_first"
@@ -292,8 +296,9 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      FASE 1 implementada completamente:
+      FASE 1 Y FASE 2 implementadas completamente:
       
+      FASE 1 - Base de Datos y Formularios (✅ TESTEADO):
       Backend:
       - Campo 'departamento' agregado al modelo Client
       - Campos 'valor_zero' y 'valor_span' agregados al modelo SensorCalibration
@@ -306,12 +311,39 @@ agent_communication:
       - Auto-completado implementado: al ingresar número de serie, se cargan datos del catálogo
       - Campos 'valor_zero' y 'valor_span' agregados a la tabla de calibración en EquipmentReview
       
+      FASE 2 - Certificado PDF (PENDIENTE DE TESTING):
+      Backend:
+      - Librería ReportLab instalada
+      - Logo ASCONSA guardado en /app/backend/static/logo_asconsa.png
+      - Módulo pdf_generator.py creado con:
+        * Logo en parte superior izquierda (6cm x 3cm)
+        * Texto legal de certificación
+        * Tabla completa de datos del equipo y cliente (incluyendo Departamento)
+        * Tabla de sensores con todos los campos (incluyendo Zero y SPAN)
+        * Repuestos utilizados
+        * Observaciones
+        * Espacio para firmas digitales (Técnico y Supervisor)
+        * Pie de página con fecha de emisión
+      - Endpoint GET /api/equipment/{serial_number}/certificate para generar y descargar PDF
+      
+      Frontend:
+      - Descarga automática de PDF implementada después de calibrar equipo
+      - Usuario recibe notificación de descarga exitosa
+      
       Necesito testing completo de:
-      1. Agregar cliente con departamento
-      2. Ingresar equipo nuevo (debe guardarse en catálogo)
-      3. Ingresar mismo equipo nuevamente (debe auto-completar datos)
-      4. Calibrar equipo con nuevos campos Zero y SPAN
-      5. Verificar que todos los datos se guarden correctamente
+      FASE 1 (ya testeado por backend_testing_agent - ✅ PASSED)
+      
+      FASE 2 - Testing necesario:
+      1. Crear y calibrar un equipo nuevo
+      2. Verificar que el PDF se genere correctamente
+      3. Verificar que el PDF contenga todos los elementos:
+         - Logo de ASCONSA
+         - Texto legal
+         - Datos del equipo y cliente (con departamento)
+         - Tabla de sensores (con Zero y SPAN)
+         - Repuestos utilizados
+         - Firmas
+      4. Verificar descarga automática en frontend
   - agent: "testing"
     message: |
       🎉 FASE 1 TESTING COMPLETADO EXITOSAMENTE - TODOS LOS BACKEND TESTS PASARON
