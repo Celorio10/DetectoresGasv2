@@ -102,7 +102,7 @@ class CalibrationHistory(BaseModel):
     observations: str = ""
     entry_date: str
     calibration_data: List['SensorCalibration']
-    spare_parts: str
+    spare_parts: Optional[List['SparePart']] = None
     calibration_date: str
     technician: str
     delivery_note: Optional[str] = None
