@@ -182,6 +182,33 @@ export default function EquipmentReview() {
         getAuthHeaders()
       );
       toast.success('Equipo calibrado correctamente');
+      
+      // Descargar el certificado PDF automáticamente
+      try {
+        const response = await axios.get(
+          `${API}/equipment/${equipment.serial_number}/certificate`,
+          {
+            ...getAuthHeaders(),
+            responseType: 'blob'
+          }
+        );
+        
+        // Crear un enlace temporal para descargar el PDF
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', `Certificado_Calibracion_${equipment.serial_number}.pdf`);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        
+        toast.success('Certificado PDF descargado');
+      } catch (pdfError) {
+        console.error('Error descargando PDF:', pdfError);
+        toast.error('Error al descargar el certificado PDF');
+      }
+      
       // Reset
       setEquipment(null);
       setSearchSerial("");
