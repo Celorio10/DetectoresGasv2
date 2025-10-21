@@ -75,6 +75,18 @@ class Technician(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
 
+class EquipmentCatalog(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    serial_number: str
+    brand: str
+    model: str
+    client_name: str
+    client_cif: str
+    client_departamento: str = ""
+    last_entry_date: str
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+
 class SensorCalibration(BaseModel):
     sensor: str
     pre_alarm: str
