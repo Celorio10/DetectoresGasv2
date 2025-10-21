@@ -159,7 +159,7 @@ def generate_certificate_pdf(equipment_data, output_path):
             row = [
                 Paragraph(part.get('descripcion', ''), info_style),
                 Paragraph(part.get('referencia', ''), info_style),
-                Paragraph('GARANTÍA' if part.get('garantia', False) else '', info_style)
+                Paragraph('SÍ' if part.get('garantia', False) else 'NO', info_style)
             ]
             spare_rows.append(row)
         
