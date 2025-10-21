@@ -308,8 +308,8 @@ class WorkshopAPITester:
         return success, response
 
 def main():
-    print("🚀 Starting Workshop Management API Tests")
-    print("=" * 50)
+    print("🚀 Starting FASE 1 - Workshop Management API Tests")
+    print("=" * 60)
     
     tester = WorkshopAPITester()
     
@@ -339,26 +339,52 @@ def main():
     model_success, model_name = tester.test_create_model()
     tester.test_get_models()
     
+    # FASE 1: Test client with departamento field
     client_success, client_data = tester.test_create_client()
     tester.test_get_clients()
     
     tech_success, tech_name = tester.test_create_technician()
     tester.test_get_technicians()
     
-    # Test equipment workflow
-    print("\n📋 EQUIPMENT WORKFLOW TESTS")
-    print("-" * 30)
+    # FASE 1: Test equipment workflow with new features
+    print("\n📋 FASE 1 - EQUIPMENT WORKFLOW TESTS")
+    print("-" * 40)
     
     if brand_success and model_success and client_success:
+        # Test equipment creation (should save to catalog)
         equip_success, serial_number = tester.test_create_equipment(brand_name, model_name, client_data)
         
         if equip_success:
+            # Test getting equipment from catalog by serial
+            catalog_success, catalog_data = tester.test_get_equipment_catalog_by_serial(serial_number)
+            
+            # Verify catalog data contains expected fields
+            if catalog_success and catalog_data:
+                print(f"   📋 Catalog data: {json.dumps(catalog_data, indent=2)}")
+                required_fields = ['serial_number', 'brand', 'model', 'client_name', 'client_cif', 'client_departamento']
+                missing_fields = [field for field in required_fields if field not in catalog_data]
+                if missing_fields:
+                    tester.log_test("Catalog Data Validation", False, f"Missing fields: {missing_fields}")
+                else:
+                    tester.log_test("Catalog Data Validation", True, "All required fields present")
+            
+            # Test getting equipment by serial
             get_success, equipment_data = tester.test_get_equipment_by_serial(serial_number)
             
             if get_success and tech_success:
-                calib_success = tester.test_calibrate_equipment(serial_number, tech_name)
+                # FASE 1: Test calibration with valor_zero and valor_span
+                calib_success, calib_response = tester.test_calibrate_equipment(serial_number, tech_name)
                 
                 if calib_success:
+                    # Verify calibration data contains new fields
+                    if calib_response and 'calibration_data' in calib_response:
+                        calibration_data = calib_response['calibration_data'][0]
+                        if 'valor_zero' in calibration_data and 'valor_span' in calibration_data:
+                            tester.log_test("Calibration Data Validation", True, "valor_zero and valor_span fields present")
+                            print(f"   📋 Calibration data: valor_zero={calibration_data['valor_zero']}, valor_span={calibration_data['valor_span']}")
+                        else:
+                            tester.log_test("Calibration Data Validation", False, "valor_zero or valor_span fields missing")
+                    
                     cal_list_success, calibrated_list = tester.test_get_calibrated_equipment()
                     
                     if cal_list_success:
@@ -368,12 +394,19 @@ def main():
                             tester.test_get_delivered_equipment()
     
     # Print final results
-    print("\n" + "=" * 50)
-    print(f"📊 FINAL RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
-    print("=" * 50)
+    print("\n" + "=" * 60)
+    print(f"📊 FASE 1 RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("=" * 60)
+    
+    # Print detailed results for failed tests
+    failed_tests = [test for test in tester.test_results if not test['success']]
+    if failed_tests:
+        print("\n❌ FAILED TESTS:")
+        for test in failed_tests:
+            print(f"   • {test['test']}: {test['details']}")
     
     if tester.tests_passed == tester.tests_run:
-        print("🎉 All tests passed!")
+        print("🎉 All FASE 1 tests passed!")
         return 0
     else:
         print(f"⚠️  {tester.tests_run - tester.tests_passed} tests failed")
