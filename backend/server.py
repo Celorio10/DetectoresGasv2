@@ -325,6 +325,33 @@ async def get_pending_equipment(current_user: dict = Depends(get_current_user)):
     equipment = await db.equipment.find({"status": "pending"}, {"_id": 0}).to_list(1000)
     return equipment
 
+@api_router.get("/equipment/{serial_number}/certificate")
+async def download_certificate(serial_number: str, current_user: dict = Depends(get_current_user)):
+    """Generar y descargar certificado PDF de calibración"""
+    equipment = await db.equipment.find_one({"serial_number": serial_number}, {"_id": 0})
+    if not equipment:
+        raise HTTPException(status_code=404, detail="Equipment not found")
+    
+    if equipment.get('status') != 'calibrated':
+        raise HTTPException(status_code=400, detail="Equipment not calibrated yet")
+    
+    # Generar el PDF
+    pdf_dir = Path(ROOT_DIR) / 'temp_pdfs'
+    pdf_dir.mkdir(exist_ok=True)
+    
+    pdf_filename = f"certificado_{serial_number}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.pdf"
+    pdf_path = pdf_dir / pdf_filename
+    
+    try:
+        generate_certificate_pdf(equipment, str(pdf_path))
+        return FileResponse(
+            path=str(pdf_path),
+            media_type='application/pdf',
+            filename=f"Certificado_Calibracion_{serial_number}.pdf"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
+
 @api_router.get("/equipment/calibrated", response_model=List[Equipment])
 async def get_calibrated_equipment(current_user: dict = Depends(get_current_user)):
     equipment = await db.equipment.find({"status": "calibrated"}, {"_id": 0}).to_list(1000)
