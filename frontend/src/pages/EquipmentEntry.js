@@ -107,12 +107,37 @@ export default function EquipmentEntry() {
       try {
         await axios.post(`${API}/clients`, newClient, getAuthHeaders());
         toast.success('Cliente añadido');
-        setNewClient({ name: "", cif: "" });
+        setNewClient({ name: "", cif: "", departamento: "" });
         loadData();
       } catch (error) {
         toast.error(error.response?.data?.detail || 'Error al añadir cliente');
       }
     }, 300);
+  };
+
+  const handleSerialNumberChange = async (serialNumber) => {
+    setFormData({...formData, serial_number: serialNumber});
+    
+    if (serialNumber.trim().length > 0) {
+      try {
+        const response = await axios.get(`${API}/equipment-catalog/serial/${serialNumber}`, getAuthHeaders());
+        if (response.data) {
+          // Auto-complete form with catalog data
+          setFormData({
+            ...formData,
+            serial_number: serialNumber,
+            brand: response.data.brand,
+            model: response.data.model,
+            client_name: response.data.client_name,
+            client_cif: response.data.client_cif,
+            client_departamento: response.data.client_departamento || ""
+          });
+          toast.info('Datos del equipo cargados desde el catálogo');
+        }
+      } catch (error) {
+        // If not found in catalog, it's a new equipment - no error needed
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
