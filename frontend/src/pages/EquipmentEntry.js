@@ -366,6 +366,29 @@ export default function EquipmentEntry() {
               </div>
             </div>
 
+            {/* Department */}
+            {selectedClientDepartamentos.length > 0 && (
+              <div>
+                <Label htmlFor="departamento">Departamento</Label>
+                <div className="mt-2">
+                  <Select 
+                    value={formData.client_departamento} 
+                    onValueChange={(value) => setFormData({...formData, client_departamento: value})} 
+                    required
+                  >
+                    <SelectTrigger data-testid="department-select">
+                      <SelectValue placeholder="Seleccionar departamento" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {selectedClientDepartamentos.map((dep, index) => (
+                        <SelectItem key={index} value={dep}>{dep}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Serial Number */}
               <div>
