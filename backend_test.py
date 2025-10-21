@@ -153,13 +153,14 @@ class WorkshopAPITester:
         return success
 
     def test_create_client(self):
-        """Test creating a client"""
+        """Test creating a client with departamento field"""
         client_data = {
-            "name": f"TestClient_{datetime.now().strftime('%H%M%S')}",
-            "cif": f"CIF{datetime.now().strftime('%H%M%S')}"
+            "name": f"Cliente Test {datetime.now().strftime('%H%M%S')}",
+            "cif": f"A{datetime.now().strftime('%H%M%S')}",
+            "departamento": "Mantenimiento"
         }
         success, response = self.run_test(
-            "Create Client",
+            "Create Client with Departamento",
             "POST",
             "clients",
             200,
