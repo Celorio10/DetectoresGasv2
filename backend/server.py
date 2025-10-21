@@ -472,13 +472,17 @@ async def get_calibrated_equipment(current_user: dict = Depends(get_current_user
 @api_router.put("/equipment/deliver")
 async def deliver_equipment(delivery: DeliveryUpdate, current_user: dict = Depends(get_current_user)):
     for serial in delivery.serial_numbers:
+        # Generar número de certificado único para cada equipo
+        certificate_number = await generate_certificate_number()
+        
         await db.equipment.update_one(
             {"serial_number": serial},
             {"$set": {
                 "status": "delivered",
                 "delivery_note": delivery.delivery_note,
                 "delivery_location": delivery.delivery_location,
-                "delivery_date": delivery.delivery_date
+                "delivery_date": delivery.delivery_date,
+                "certificate_number": certificate_number
             }}
         )
     return {"message": f"{len(delivery.serial_numbers)} equipment delivered"}
