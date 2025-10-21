@@ -169,7 +169,8 @@ export default function EquipmentEntry() {
       setFormData({
         ...formData,
         client_name: client.name,
-        client_cif: client.cif
+        client_cif: client.cif,
+        client_departamento: client.departamento || ""
       });
     }
   };
