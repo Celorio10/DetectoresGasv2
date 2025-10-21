@@ -89,7 +89,7 @@ def generate_certificate_pdf(equipment_data, output_path):
          Paragraph("<b>LOCALIDAD:</b>", info_style), Paragraph(equipment_data.get('client_departamento', 'N/A'), info_style)],
         [Paragraph("<b>EQUIPO:</b>", info_style), Paragraph(f"{equipment_data.get('brand', '')} {equipment_data.get('model', '')}", info_style),
          Paragraph("<b>No. SERIE:</b>", info_style), Paragraph(equipment_data.get('serial_number', 'N/A'), info_style)],
-        [Paragraph("<b>Nº ALBARÁN:</b>", info_style), Paragraph("", info_style),
+        [Paragraph("<b>Nº ALBARÁN:</b>", info_style), Paragraph(equipment_data.get('delivery_note', ''), info_style),
          Paragraph("<b>FECHA:</b>", info_style), Paragraph(equipment_data.get('calibration_date', 'N/A'), info_style)]
     ]
     
