@@ -83,7 +83,6 @@ def generate_certificate_pdf(equipment_data, output_path):
     
     # Información del equipo en cajas
     info_style = ParagraphStyle('Info', parent=styles['Normal'], fontSize=9, leading=11)
-    bold_style = ParagraphStyle('Bold', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold', leading=11)
     
     info_data = [
         [Paragraph("<b>CLIENTE:</b>", info_style), Paragraph(equipment_data.get('client_name', 'N/A'), info_style),
