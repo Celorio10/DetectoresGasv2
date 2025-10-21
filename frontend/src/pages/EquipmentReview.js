@@ -403,6 +403,22 @@ export default function EquipmentReview() {
                         </td>
                         <td className="p-2">
                           <Input
+                            value={row.valor_zero}
+                            onChange={(e) => handleCalibrationChange(index, 'valor_zero', e.target.value)}
+                            placeholder="Zero"
+                            data-testid={`valor-zero-input-${index}`}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <Input
+                            value={row.valor_span}
+                            onChange={(e) => handleCalibrationChange(index, 'valor_span', e.target.value)}
+                            placeholder="SPAN"
+                            data-testid={`valor-span-input-${index}`}
+                          />
+                        </td>
+                        <td className="p-2">
+                          <Input
                             value={row.calibration_bottle}
                             onChange={(e) => handleCalibrationChange(index, 'calibration_bottle', e.target.value)}
                             placeholder="Botella"
