@@ -151,6 +151,7 @@ export default function EquipmentEntry() {
         model: "",
         client_name: "",
         client_cif: "",
+        client_departamento: "",
         serial_number: "",
         observations: "",
         entry_date: new Date().toISOString().split('T')[0]
