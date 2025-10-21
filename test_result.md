@@ -235,39 +235,48 @@ frontend:
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/pdf_generator.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Módulo pdf_generator.py creado con función generate_certificate_pdf que incluye logo, texto legal, tabla de sensores, datos del equipo/cliente y firmas"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Módulo PDF funciona correctamente. PDF generado exitosamente con 469,607 bytes. Contiene logo ASCONSA, texto legal, datos completos del equipo/cliente (incluyendo departamento), tabla de sensores con valores Zero/SPAN, repuestos utilizados y firmas digitales. PDF válido verificado con header %PDF-1.4."
 
   - task: "Endpoint para generar y descargar certificado PDF"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint GET /api/equipment/{serial_number}/certificate creado para generar y descargar PDF de certificado de calibración"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Endpoint GET /api/equipment/{serial_number}/certificate funciona perfectamente. Retorna PDF con Content-Type: application/pdf correcto. Filename: 'Certificado_Calibracion_{serial}.pdf'. PDF se genera y descarga automáticamente. Verificado con equipo SN-PDF-TEST-001 calibrado con 3 sensores (CO, H2S, O2)."
 
   - task: "Guardar logo de empresa ASCONSA"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/static/logo_asconsa.png"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Logo descargado y guardado en /app/backend/static/logo_asconsa.png con fondo transparente"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Logo ASCONSA existe en /app/backend/static/logo_asconsa.png y se integra correctamente en el PDF generado. Logo aparece en la parte superior izquierda del certificado con dimensiones 6cm x 3cm como especificado."
 
 metadata:
   created_by: "main_agent"
