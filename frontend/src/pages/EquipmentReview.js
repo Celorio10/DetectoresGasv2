@@ -125,6 +125,8 @@ export default function EquipmentReview() {
         pre_alarm: "",
         alarm: "",
         calibration_value: "",
+        valor_zero: "",
+        valor_span: "",
         calibration_bottle: "",
         approved: false
       }]);
