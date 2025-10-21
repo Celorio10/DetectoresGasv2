@@ -101,3 +101,150 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+user_problem_statement: |
+  Sistema de gestión de equipos en taller con funcionalidades de entrada, revisión, salida y resumen.
+  FASE 1: Agregar campo "Departamento" a clientes, campos "Valor de Zero" y "Valor de SPAN" a calibración de sensores, e implementar auto-completado de equipos.
+  FASE 2: Generar certificado PDF con logo de empresa, tabla de sensores, datos de equipo/cliente y firmas digitales.
+
+backend:
+  - task: "Agregar campo departamento al modelo Client"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campo 'departamento' agregado al modelo Client (línea 71)"
+
+  - task: "Agregar campos valor_zero y valor_span al modelo SensorCalibration"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campos 'valor_zero' y 'valor_span' agregados al modelo SensorCalibration (líneas 83-84)"
+
+  - task: "Crear modelo EquipmentCatalog para persistencia de equipos"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Modelo EquipmentCatalog creado con serial_number, brand, model, client_name, client_cif, client_departamento (líneas 77-85)"
+
+  - task: "Endpoint para obtener equipo del catálogo por serial"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Endpoint GET /api/equipment-catalog/serial/{serial_number} creado para obtener datos históricos del equipo"
+
+  - task: "Actualizar endpoint de creación de equipos para guardar en catálogo"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "POST /api/equipment actualizado para guardar/actualizar entrada en equipment_catalog usando upsert"
+
+frontend:
+  - task: "Agregar campo Departamento al formulario de cliente en EquipmentEntry"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentEntry.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campo 'departamento' agregado al formulario de nuevo cliente y al estado del componente"
+
+  - task: "Implementar auto-completado de equipos por número de serie"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentEntry.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Función handleSerialNumberChange implementada para cargar datos del catálogo cuando se ingresa un número de serie existente"
+
+  - task: "Agregar columnas Valor de Zero y Valor de SPAN en tabla de calibración"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentReview.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campos 'valor_zero' y 'valor_span' agregados a la tabla de calibración de sensores con sus respectivos inputs"
+
+metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 0
+  run_ui: false
+
+test_plan:
+  current_focus:
+    - "Agregar campo departamento al modelo Client"
+    - "Agregar campos valor_zero y valor_span al modelo SensorCalibration"
+    - "Crear modelo EquipmentCatalog para persistencia de equipos"
+    - "Endpoint para obtener equipo del catálogo por serial"
+    - "Actualizar endpoint de creación de equipos para guardar en catálogo"
+    - "Agregar campo Departamento al formulario de cliente en EquipmentEntry"
+    - "Implementar auto-completado de equipos por número de serie"
+    - "Agregar columnas Valor de Zero y Valor de SPAN en tabla de calibración"
+  stuck_tasks: []
+  test_all: true
+  test_priority: "high_first"
+
+agent_communication:
+  - agent: "main"
+    message: |
+      FASE 1 implementada completamente:
+      
+      Backend:
+      - Campo 'departamento' agregado al modelo Client
+      - Campos 'valor_zero' y 'valor_span' agregados al modelo SensorCalibration
+      - Modelo EquipmentCatalog creado para almacenar equipos permanentemente
+      - Endpoint GET /api/equipment-catalog/serial/{serial_number} para obtener datos históricos
+      - POST /api/equipment actualizado para guardar en catálogo con upsert
+      
+      Frontend:
+      - Campo 'departamento' agregado al formulario de nuevo cliente en EquipmentEntry
+      - Auto-completado implementado: al ingresar número de serie, se cargan datos del catálogo
+      - Campos 'valor_zero' y 'valor_span' agregados a la tabla de calibración en EquipmentReview
+      
+      Necesito testing completo de:
+      1. Agregar cliente con departamento
+      2. Ingresar equipo nuevo (debe guardarse en catálogo)
+      3. Ingresar mismo equipo nuevamente (debe auto-completar datos)
+      4. Calibrar equipo con nuevos campos Zero y SPAN
+      5. Verificar que todos los datos se guarden correctamente
