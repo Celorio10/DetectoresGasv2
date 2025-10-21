@@ -233,7 +233,7 @@ class WorkshopAPITester:
         return success, response
 
     def test_calibrate_equipment(self, serial_number, technician):
-        """Test calibrating equipment"""
+        """Test calibrating equipment with valor_zero and valor_span fields"""
         calibration_data = {
             "calibration_data": [
                 {
@@ -241,22 +241,24 @@ class WorkshopAPITester:
                     "pre_alarm": "25",
                     "alarm": "50",
                     "calibration_value": "100",
-                    "calibration_bottle": "B001",
+                    "valor_zero": "0",
+                    "valor_span": "100",
+                    "calibration_bottle": "BOT-001",
                     "approved": True
                 }
             ],
-            "spare_parts": "Test spare parts",
+            "spare_parts": "Filtro reemplazado",
             "calibration_date": datetime.now().strftime('%Y-%m-%d'),
             "technician": technician
         }
         success, response = self.run_test(
-            "Calibrate Equipment",
+            "Calibrate Equipment with Valor Zero/Span",
             "PUT",
             f"equipment/{serial_number}/calibrate",
             200,
             data=calibration_data
         )
-        return success
+        return success, response
 
     def test_get_calibrated_equipment(self):
         """Test getting calibrated equipment"""
