@@ -654,4 +654,8 @@ def main():
         return 1
 
 if __name__ == "__main__":
-    sys.exit(main())
+    # Check if we should run FASE 2 tests
+    if len(sys.argv) > 1 and sys.argv[1] == "fase2":
+        sys.exit(test_fase2_pdf_generation())
+    else:
+        sys.exit(main())
