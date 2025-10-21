@@ -136,6 +136,7 @@ class Equipment(BaseModel):
     delivery_note: Optional[str] = None
     delivery_location: Optional[str] = None
     delivery_date: Optional[str] = None
+    certificate_number: Optional[str] = None
 
 class EquipmentCreate(BaseModel):
     brand: str
