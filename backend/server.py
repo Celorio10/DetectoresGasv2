@@ -336,6 +336,31 @@ async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate
     
     await db.equipment.update_one({"serial_number": serial_number}, {"$set": update_data})
     updated = await db.equipment.find_one({"serial_number": serial_number}, {"_id": 0})
+    
+    # Guardar en historial de calibraciones
+    history_entry = CalibrationHistory(
+        serial_number=equipment['serial_number'],
+        brand=equipment['brand'],
+        model=equipment['model'],
+        client_name=equipment['client_name'],
+        client_cif=equipment['client_cif'],
+        client_departamento=equipment.get('client_departamento', ''),
+        observations=equipment.get('observations', ''),
+        entry_date=equipment['entry_date'],
+        calibration_data=calibration.calibration_data,
+        spare_parts=calibration.spare_parts,
+        calibration_date=calibration.calibration_date,
+        technician=calibration.technician
+    )
+    await db.calibration_history.insert_one(history_entry.model_dump())
+    
+    # Actualizar catálogo con última calibración
+    await db.equipment_catalog.update_one(
+        {"serial_number": serial_number},
+        {"$set": {"last_calibration_data": [item.model_dump() for item in calibration.calibration_data]}},
+        upsert=False
+    )
+    
     return updated
 
 @api_router.get("/equipment/pending", response_model=List[Equipment])
