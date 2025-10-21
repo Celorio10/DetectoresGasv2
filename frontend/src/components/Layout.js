@@ -20,7 +20,8 @@ export default function Layout({ children }) {
     { path: "/entrada", label: "Entrada", icon: FileInput, testId: "nav-entrada" },
     { path: "/revision", label: "Revisión", icon: ClipboardCheck, testId: "nav-revision" },
     { path: "/salida", label: "Salida", icon: PackageOpen, testId: "nav-salida" },
-    { path: "/resumen", label: "Resumen", icon: BarChart3, testId: "nav-resumen" }
+    { path: "/resumen", label: "Resumen", icon: BarChart3, testId: "nav-resumen" },
+    { path: "/historial", label: "Historial", icon: History, testId: "nav-historial" }
   ];
 
   return (
