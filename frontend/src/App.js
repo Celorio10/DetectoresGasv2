@@ -53,6 +53,10 @@ function App() {
             path="/resumen" 
             element={isAuthenticated ? <EquipmentSummary /> : <Navigate to="/login" />} 
           />
+          <Route 
+            path="/historial" 
+            element={isAuthenticated ? <EquipmentHistory /> : <Navigate to="/login" />} 
+          />
         </Routes>
       </BrowserRouter>
     </div>
