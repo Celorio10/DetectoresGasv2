@@ -344,6 +344,210 @@ class WorkshopAPITester:
             self.log_test("PDF Certificate Download", False, f"Exception: {str(e)}")
             return False, None
 
+def test_fase2_pdf_generation():
+    """Test FASE 2 - PDF Certificate Generation as specified in review request"""
+    print("🚀 Starting FASE 2 - PDF Certificate Generation Tests")
+    print("=" * 60)
+    
+    tester = WorkshopAPITester()
+    
+    # Test authentication flow
+    print("\n📋 AUTHENTICATION TESTS")
+    print("-" * 30)
+    
+    reg_success, username = tester.test_auth_register()
+    if not reg_success:
+        print("❌ Registration failed, stopping tests")
+        return 1
+    
+    login_success = tester.test_auth_login(username)
+    if not login_success:
+        print("❌ Login failed, stopping tests")
+        return 1
+    
+    tester.test_auth_me()
+    
+    # FASE 2: Create test data as specified in review request
+    print("\n📋 FASE 2 - CREATING TEST DATA FOR PDF GENERATION")
+    print("-" * 50)
+    
+    # 1. Create brand Honeywell
+    print("🔧 Creating brand: Honeywell")
+    brand_success, _ = tester.run_test(
+        "Create Honeywell Brand",
+        "POST",
+        "brands",
+        200,
+        data={"name": "Honeywell"}
+    )
+    
+    # 2. Create model XT-2000
+    print("🔧 Creating model: XT-2000")
+    model_success, _ = tester.run_test(
+        "Create XT-2000 Model",
+        "POST",
+        "models",
+        200,
+        data={"name": "XT-2000"}
+    )
+    
+    # 3. Create client with departamento
+    print("🔧 Creating client: Empresa Prueba PDF")
+    client_data = {
+        "name": "Empresa Prueba PDF",
+        "cif": "B87654321",
+        "departamento": "Seguridad Industrial"
+    }
+    client_success, _ = tester.run_test(
+        "Create Client with Departamento",
+        "POST",
+        "clients",
+        200,
+        data=client_data
+    )
+    
+    # 4. Create technician
+    print("🔧 Creating technician: Carlos Rodríguez")
+    tech_success, _ = tester.run_test(
+        "Create Technician Carlos Rodriguez",
+        "POST",
+        "technicians",
+        200,
+        data={"name": "Carlos Rodríguez"}
+    )
+    
+    # 5. Create equipment
+    print("🔧 Creating equipment: SN-PDF-TEST-001")
+    equipment_data = {
+        "brand": "Honeywell",
+        "model": "XT-2000",
+        "client_name": "Empresa Prueba PDF",
+        "client_cif": "B87654321",
+        "client_departamento": "Seguridad Industrial",
+        "serial_number": "SN-PDF-TEST-001",
+        "observations": "Equipo para prueba de certificado PDF",
+        "entry_date": "2025-01-20"
+    }
+    equip_success, _ = tester.run_test(
+        "Create Equipment for PDF Test",
+        "POST",
+        "equipment",
+        200,
+        data=equipment_data
+    )
+    
+    if not all([brand_success, model_success, client_success, tech_success, equip_success]):
+        print("❌ Failed to create required test data, stopping PDF tests")
+        return 1
+    
+    # 6. Calibrate equipment with multiple sensors
+    print("🔧 Calibrating equipment with multiple sensors")
+    calibration_data = {
+        "calibration_data": [
+            {
+                "sensor": "CO (Monóxido de Carbono)",
+                "pre_alarm": "25 ppm",
+                "alarm": "50 ppm",
+                "calibration_value": "100 ppm",
+                "valor_zero": "0 ppm",
+                "valor_span": "100 ppm",
+                "calibration_bottle": "BOT-CO-001",
+                "approved": True
+            },
+            {
+                "sensor": "H2S (Sulfuro de Hidrógeno)",
+                "pre_alarm": "5 ppm",
+                "alarm": "10 ppm",
+                "calibration_value": "25 ppm",
+                "valor_zero": "0 ppm",
+                "valor_span": "25 ppm",
+                "calibration_bottle": "BOT-H2S-002",
+                "approved": True
+            },
+            {
+                "sensor": "O2 (Oxígeno)",
+                "pre_alarm": "19.5%",
+                "alarm": "23.5%",
+                "calibration_value": "20.9%",
+                "valor_zero": "0%",
+                "valor_span": "20.9%",
+                "calibration_bottle": "BOT-O2-003",
+                "approved": True
+            }
+        ],
+        "spare_parts": "Filtro de entrada reemplazado, Sensor de CO calibrado, Batería verificada",
+        "calibration_date": "2025-01-20",
+        "technician": "Carlos Rodríguez"
+    }
+    
+    calib_success, calib_response = tester.run_test(
+        "Calibrate Equipment with Multiple Sensors",
+        "PUT",
+        "equipment/SN-PDF-TEST-001/calibrate",
+        200,
+        data=calibration_data
+    )
+    
+    if not calib_success:
+        print("❌ Failed to calibrate equipment, stopping PDF tests")
+        return 1
+    
+    print("✅ Equipment calibrated successfully")
+    
+    # 7. Test PDF certificate generation and download
+    print("\n📋 FASE 2 - PDF CERTIFICATE GENERATION TEST")
+    print("-" * 45)
+    
+    pdf_success, pdf_content = tester.test_download_certificate_pdf("SN-PDF-TEST-001")
+    
+    if pdf_success:
+        print("✅ PDF certificate generated and downloaded successfully")
+        print(f"   📄 PDF size: {len(pdf_content)} bytes")
+        
+        # Save PDF for manual inspection if needed
+        try:
+            with open("/app/test_certificate.pdf", "wb") as f:
+                f.write(pdf_content)
+            print("   📁 PDF saved as /app/test_certificate.pdf for inspection")
+        except Exception as e:
+            print(f"   ⚠️ Could not save PDF file: {e}")
+    else:
+        print("❌ PDF certificate generation failed")
+    
+    # 8. Verify equipment status is still calibrated
+    print("\n🔍 Verifying equipment status after PDF generation")
+    status_success, equipment_status = tester.run_test(
+        "Verify Equipment Status After PDF",
+        "GET",
+        "equipment/serial/SN-PDF-TEST-001",
+        200
+    )
+    
+    if status_success and equipment_status:
+        if equipment_status.get('status') == 'calibrated':
+            tester.log_test("Equipment Status Verification", True, "Equipment remains calibrated after PDF generation")
+        else:
+            tester.log_test("Equipment Status Verification", False, f"Equipment status is {equipment_status.get('status')}, expected 'calibrated'")
+    
+    # Print final results
+    print("\n" + "=" * 60)
+    print(f"📊 FASE 2 PDF RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("=" * 60)
+    
+    # Print detailed results for failed tests
+    failed_tests = [test for test in tester.test_results if not test['success']]
+    if failed_tests:
+        print("\n❌ FAILED TESTS:")
+        for test in failed_tests:
+            print(f"   • {test['test']}: {test['details']}")
+    
+    if tester.tests_passed == tester.tests_run:
+        print("🎉 All FASE 2 PDF tests passed!")
+        return 0
+    else:
+        print(f"⚠️  {tester.tests_run - tester.tests_passed} tests failed")
+        return 1
+
 def main():
     print("🚀 Starting FASE 1 - Workshop Management API Tests")
     print("=" * 60)
