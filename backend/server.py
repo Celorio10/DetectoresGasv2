@@ -119,6 +119,11 @@ class SensorCalibration(BaseModel):
     calibration_bottle: str
     approved: bool
 
+class SparePart(BaseModel):
+    descripcion: str
+    referencia: str
+    garantia: bool = False
+
 class Equipment(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
