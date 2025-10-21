@@ -196,6 +196,25 @@ export default function EquipmentReview() {
     setCalibrationData(newData);
   };
 
+  const handleAddSparePart = () => {
+    if (newSparePart.descripcion.trim() && newSparePart.referencia.trim()) {
+      setSpareParts([...spareParts, { ...newSparePart }]);
+      setNewSparePart({ descripcion: "", referencia: "", garantia: false });
+    } else {
+      toast.error('Completa descripción y referencia');
+    }
+  };
+
+  const handleRemoveSparePart = (index) => {
+    setSpareParts(spareParts.filter((_, i) => i !== index));
+  };
+
+  const handleToggleGarantia = (index) => {
+    const newParts = [...spareParts];
+    newParts[index].garantia = !newParts[index].garantia;
+    setSpareParts(newParts);
+  };
+
   const handleCalibrationChange = (index, field, value) => {
     const newData = [...calibrationData];
     newData[index][field] = value;
