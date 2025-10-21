@@ -99,22 +99,43 @@ export default function EquipmentEntry() {
   };
 
   const handleAddClient = async () => {
-    if (!newClient.name.trim() || !newClient.cif.trim()) return;
+    if (!newClient.name.trim() || !newClient.cif.trim() || newClient.departamentos.length === 0) {
+      toast.error('Debes agregar al menos un departamento');
+      return;
+    }
     
     // Cerrar el modal primero
     setClientDialogOpen(false);
     
     // Delay más largo para asegurar que el modal y overlay se cierran completamente
     setTimeout(async () => {
-      try {
+      try:
         await axios.post(`${API}/clients`, newClient, getAuthHeaders());
         toast.success('Cliente añadido');
-        setNewClient({ name: "", cif: "", departamento: "" });
+        setNewClient({ name: "", cif: "", departamentos: [] });
+        setNewDepartamento("");
         loadData();
       } catch (error) {
         toast.error(error.response?.data?.detail || 'Error al añadir cliente');
       }
     }, 300);
+  };
+
+  const handleAddDepartamentoToNewClient = () => {
+    if (newDepartamento.trim()) {
+      setNewClient({
+        ...newClient,
+        departamentos: [...newClient.departamentos, newDepartamento.trim()]
+      });
+      setNewDepartamento("");
+    }
+  };
+
+  const handleRemoveDepartamentoFromNewClient = (index) => {
+    setNewClient({
+      ...newClient,
+      departamentos: newClient.departamentos.filter((_, i) => i !== index)
+    });
   };
 
   const handleSerialNumberChange = async (serialNumber) => {
