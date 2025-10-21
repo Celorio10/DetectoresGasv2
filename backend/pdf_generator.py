@@ -1,195 +1,257 @@
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.units import cm
+from reportlab.lib.units import cm, mm
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, Image, KeepTogether
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_JUSTIFY, TA_RIGHT
+from reportlab.pdfgen import canvas
 from pathlib import Path
 import os
 from datetime import datetime
 
 def generate_certificate_pdf(equipment_data, output_path):
     """
-    Genera un certificado PDF de calibración para un equipo.
-    Diseño moderno y compacto que cabe en una sola página.
+    Genera un certificado PDF similar al formato ASCONSA original.
+    Diseño basado en el certificado de ejemplo con logo, tablas y estructura específica.
     """
-    # Crear el documento con márgenes reducidos
+    # Crear el documento
     doc = SimpleDocTemplate(
         output_path,
         pagesize=A4,
-        rightMargin=1.5*cm,
-        leftMargin=1.5*cm,
-        topMargin=1.5*cm,
-        bottomMargin=1.5*cm
+        rightMargin=15*mm,
+        leftMargin=15*mm,
+        topMargin=15*mm,
+        bottomMargin=15*mm
     )
     
     # Contenedor para los elementos del PDF
     elements = []
-    
-    # Estilos
     styles = getSampleStyleSheet()
     
-    # Logo pequeño en esquina superior izquierda
+    # Header con logos
     logo_path = Path(__file__).parent / 'static' / 'logo_asconsa.png'
-    if os.path.exists(logo_path):
-        logo = Image(str(logo_path), width=4*cm, height=2*cm)
-        logo.hAlign = 'LEFT'
-        elements.append(logo)
-        elements.append(Spacer(1, 0.3*cm))
     
-    # Título compacto
-    title_style = ParagraphStyle(
-        'CustomTitle',
-        parent=styles['Heading1'],
-        fontSize=14,
-        textColor=colors.HexColor('#1a5f3d'),
-        spaceAfter=10,
+    # Crear tabla para header con logos
+    header_data = []
+    header_row = []
+    
+    # Logo ASCONSA izquierda
+    if os.path.exists(logo_path):
+        logo_asconsa = Image(str(logo_path), width=50*mm, height=25*mm)
+        header_row.append(logo_asconsa)
+    else:
+        header_row.append(Paragraph("ASCONSA", styles['Heading1']))
+    
+    # Espacio central para número de certificado
+    cert_number = equipment_data.get('id', 'N/A')
+    cert_style = ParagraphStyle(
+        'CertNum',
+        parent=styles['Normal'],
+        fontSize=10,
         alignment=TA_CENTER,
         fontName='Helvetica-Bold'
     )
-    title = Paragraph("CERTIFICADO DE CALIBRACIÓN", title_style)
-    elements.append(title)
-    elements.append(Spacer(1, 0.3*cm))
+    cert_text = f"CERTIFICADO Nº<br/>{cert_number}"
+    header_row.append(Paragraph(cert_text, cert_style))
     
-    # Texto legal específico de ASCONSA
+    # Logo MSA derecha (placeholder si no existe)
+    header_row.append(Paragraph("", styles['Normal']))  # MSA logo placeholder
+    
+    header_data.append(header_row)
+    
+    header_table = Table(header_data, colWidths=[60*mm, 60*mm, 60*mm])
+    header_table.setStyle(TableStyle([
+        ('ALIGN', (0, 0), (0, 0), 'LEFT'),
+        ('ALIGN', (1, 0), (1, 0), 'CENTER'),
+        ('ALIGN', (2, 0), (2, 0), 'RIGHT'),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+    ]))
+    elements.append(header_table)
+    elements.append(Spacer(1, 5*mm))
+    
+    # Título principal
+    title_style = ParagraphStyle(
+        'Title',
+        parent=styles['Heading1'],
+        fontSize=12,
+        alignment=TA_CENTER,
+        fontName='Helvetica-Bold',
+        spaceAfter=5*mm
+    )
+    title = Paragraph("AJUSTE, VERIFICACIÓN, INSPECCIÓN Y/O REPARACIÓN", title_style)
+    elements.append(title)
+    
+    # Información del equipo en cajas
+    info_style = ParagraphStyle('Info', parent=styles['Normal'], fontSize=9, leading=11)
+    bold_style = ParagraphStyle('Bold', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold', leading=11)
+    
+    info_data = [
+        [Paragraph("<b>CLIENTE:</b>", info_style), Paragraph(equipment_data.get('client_name', 'N/A'), info_style),
+         Paragraph("<b>LOCALIDAD:</b>", info_style), Paragraph(equipment_data.get('client_departamento', 'N/A'), info_style)],
+        [Paragraph("<b>EQUIPO:</b>", info_style), Paragraph(f"{equipment_data.get('brand', '')} {equipment_data.get('model', '')}", info_style),
+         Paragraph("<b>No. SERIE:</b>", info_style), Paragraph(equipment_data.get('serial_number', 'N/A'), info_style)],
+        [Paragraph("<b>Nº ALBARÁN:</b>", info_style), Paragraph("", info_style),
+         Paragraph("<b>FECHA:</b>", info_style), Paragraph(equipment_data.get('calibration_date', 'N/A'), info_style)]
+    ]
+    
+    info_table = Table(info_data, colWidths=[30*mm, 60*mm, 30*mm, 60*mm])
+    info_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 3),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ]))
+    elements.append(info_table)
+    elements.append(Spacer(1, 5*mm))
+    
+    # Texto legal
     legal_style = ParagraphStyle(
-        'LegalText',
+        'Legal',
         parent=styles['Normal'],
         fontSize=8,
         alignment=TA_JUSTIFY,
-        spaceAfter=8,
-        leading=10
+        leading=10,
+        spaceAfter=3*mm
     )
     
     legal_text = """
-    ASCONSA Soluciones de Seguridad, SL, como taller autorizado por MSA certifica que los instrumentos 
+    <b>ASCONSA Soluciones de Seguridad, SL</b>, como taller autorizado por MSA certifica que los instrumentos 
     cuyos datos de identificación se relacionan han sido inspeccionados y/o reparados, verificados y 
     ajustados en nuestros talleres siguiendo el procedimiento establecido por el fabricante y utilizando 
-    materiales originales, y quedando por tanto el aparato en condiciones de uso. Este certificado no 
-    supone ninguna garantía para las partes o materiales no sustituidos. Toda información sobre garantías 
-    de los equipos y sus componentes se recoge en su manual de instrucciones. Se recomienda comprobar su 
-    operatividad antes de cada uso, así como pasar gas patrón por el mismo para, si procede, ajustarlo 
-    periódicamente en función del uso y asegurar la confianza de las lecturas. Se recomienda así mismo 
-    que el instrumento sea verificado por MSA o por taller autorizado con al menos una periodicidad anual, 
-    según etiqueta de PROXIMO MANTENIMIENTO pegada al instrumento, o antes si se observasen anomalías 
+    materiales originales, y quedando por tanto el aparato en condiciones de uso.
+    """
+    elements.append(Paragraph(legal_text, legal_style))
+    
+    disclaimers = """
+    Este certificado no supone ninguna garantía para las partes o materiales no sustituidos. Toda información 
+    sobre garantías de los equipos y sus componentes se recoge en su manual de instrucciones. Se recomienda 
+    comprobar su operatividad antes de cada uso, así como pasar gas patrón por el mismo para, si procede, 
+    ajustarlo periódicamente en función del uso y asegurar la confianza de las lecturas. Se recomienda así 
+    mismo que el instrumento sea verificado por MSA o por taller autorizado con al menos una periodicidad 
+    anual, según etiqueta de PROXIMO MANTENIMIENTO pegada al instrumento, o antes si se observasen anomalías 
     en su funcionamiento o deterioro en alguna de sus partes.
     """
-    legal_para = Paragraph(legal_text, legal_style)
-    elements.append(legal_para)
-    elements.append(Spacer(1, 0.3*cm))
+    elements.append(Paragraph(disclaimers, legal_style))
+    elements.append(Spacer(1, 3*mm))
     
-    # Información del Equipo y Cliente en formato compacto
-    heading_style = ParagraphStyle(
-        'Heading',
-        fontSize=10,
-        textColor=colors.HexColor('#1a5f3d'),
-        fontName='Helvetica-Bold',
-        spaceAfter=5
-    )
-    elements.append(Paragraph("DATOS DEL EQUIPO Y CLIENTE", heading_style))
+    # Tabla de Materiales Sustituidos
+    section_style = ParagraphStyle('Section', parent=styles['Normal'], fontSize=9, fontName='Helvetica-Bold')
+    elements.append(Paragraph("MATERIALES SUSTITUIDOS", section_style))
+    elements.append(Spacer(1, 2*mm))
     
-    info_data = [
-        ["Nº Serie:", equipment_data.get('serial_number', 'N/A'), "Marca:", equipment_data.get('brand', 'N/A')],
-        ["Modelo:", equipment_data.get('model', 'N/A'), "Cliente:", equipment_data.get('client_name', 'N/A')],
-        ["CIF:", equipment_data.get('client_cif', 'N/A'), "Departamento:", equipment_data.get('client_departamento', 'N/A')],
-        ["Fecha Calibración:", equipment_data.get('calibration_date', 'N/A'), "Técnico:", equipment_data.get('technician', 'N/A')]
+    spare_parts = equipment_data.get('spare_parts', '')
+    materials_data = [
+        [Paragraph("<b>SENSOR:</b>", info_style), ""],
+        [Paragraph("<b>BATERIA:</b>", info_style), ""],
+        [Paragraph("<b>INDICADOR:</b>", info_style), ""],
+        [Paragraph("<b>OTROS:</b>", info_style), Paragraph(spare_parts if spare_parts else "", info_style)]
     ]
     
-    info_table = Table(info_data, colWidths=[3*cm, 5.5*cm, 3*cm, 5.5*cm])
-    info_table.setStyle(TableStyle([
-        ('BACKGROUND', (0, 0), (0, -1), colors.HexColor('#e8f5e9')),
-        ('BACKGROUND', (2, 0), (2, -1), colors.HexColor('#e8f5e9')),
-        ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
-        ('ALIGN', (0, 0), (0, -1), 'RIGHT'),
-        ('ALIGN', (2, 0), (2, -1), 'RIGHT'),
-        ('FONTNAME', (0, 0), (0, -1), 'Helvetica-Bold'),
-        ('FONTNAME', (2, 0), (2, -1), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('BOTTOMPADDING', (0, 0), (-1, -1), 4),
-        ('TOPPADDING', (0, 0), (-1, -1), 4),
-        ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
-        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+    materials_table = Table(materials_data, colWidths=[40*mm, 140*mm])
+    materials_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 3),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
     ]))
-    elements.append(info_table)
-    elements.append(Spacer(1, 0.3*cm))
+    elements.append(materials_table)
+    elements.append(Spacer(1, 3*mm))
     
-    # Tabla de Sensores compacta
-    elements.append(Paragraph("RESULTADOS DE CALIBRACIÓN", heading_style))
+    # Tabla de Datos de Calibración
+    elements.append(Paragraph("DATOS DE CALIBRACIÓN", section_style))
+    elements.append(Spacer(1, 2*mm))
     
     calibration_data = equipment_data.get('calibration_data', [])
     if calibration_data:
-        sensor_headers = ['Sensor', 'Pre-Alarma', 'Alarma', 'Valor Cal.', 'Zero', 'SPAN', 'Botella', 'APTO']
-        sensor_rows = [sensor_headers]
+        # Headers
+        cal_headers = [
+            Paragraph("<b>GAS/SENSOR</b>", info_style),
+            Paragraph("<b>PRE-ALARMA</b>", info_style),
+            Paragraph("<b>ALARMA</b>", info_style),
+            Paragraph("<b>VALOR CAL.</b>", info_style),
+            Paragraph("<b>ZERO</b>", info_style),
+            Paragraph("<b>SPAN</b>", info_style),
+            Paragraph("<b>Nº BOTELLA</b>", info_style),
+            Paragraph("<b>APTO</b>", info_style)
+        ]
+        cal_rows = [cal_headers]
         
         for sensor in calibration_data:
             row = [
-                sensor.get('sensor', '')[:15],  # Truncar si es muy largo
-                sensor.get('pre_alarm', ''),
-                sensor.get('alarm', ''),
-                sensor.get('calibration_value', ''),
-                sensor.get('valor_zero', ''),
-                sensor.get('valor_span', ''),
-                sensor.get('calibration_bottle', ''),
-                'SÍ' if sensor.get('approved', False) else 'NO'
+                Paragraph(sensor.get('sensor', ''), info_style),
+                Paragraph(sensor.get('pre_alarm', ''), info_style),
+                Paragraph(sensor.get('alarm', ''), info_style),
+                Paragraph(sensor.get('calibration_value', ''), info_style),
+                Paragraph(sensor.get('valor_zero', ''), info_style),
+                Paragraph(sensor.get('valor_span', ''), info_style),
+                Paragraph(sensor.get('calibration_bottle', ''), info_style),
+                Paragraph('SÍ' if sensor.get('approved', False) else 'NO', info_style)
             ]
-            sensor_rows.append(row)
+            cal_rows.append(row)
         
-        sensor_table = Table(sensor_rows, colWidths=[3*cm, 1.8*cm, 1.8*cm, 1.8*cm, 1.5*cm, 1.5*cm, 2*cm, 1.3*cm])
-        sensor_table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#1a5f3d')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, -1), 8),
-            ('BOTTOMPADDING', (0, 0), (-1, 0), 6),
-            ('TOPPADDING', (0, 0), (-1, 0), 6),
-            ('BOTTOMPADDING', (0, 1), (-1, -1), 4),
-            ('TOPPADDING', (0, 1), (-1, -1), 4),
-            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+        cal_table = Table(cal_rows, colWidths=[35*mm, 18*mm, 18*mm, 20*mm, 18*mm, 18*mm, 25*mm, 15*mm])
+        cal_table.setStyle(TableStyle([
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE')
+            ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
+            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+            ('FONTSIZE', (0, 0), (-1, -1), 8),
+            ('LEFTPADDING', (0, 0), (-1, -1), 2),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 2),
+            ('TOPPADDING', (0, 0), (-1, -1), 3),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
         ]))
-        elements.append(sensor_table)
+        elements.append(cal_table)
     
-    elements.append(Spacer(1, 0.3*cm))
+    elements.append(Spacer(1, 3*mm))
     
-    # Repuestos y Observaciones en formato compacto
-    spare_parts = equipment_data.get('spare_parts', 'Ninguno')
-    if spare_parts and spare_parts.strip():
-        elements.append(Paragraph("REPUESTOS UTILIZADOS", heading_style))
-        spare_style = ParagraphStyle('Spare', parent=styles['Normal'], fontSize=8, spaceAfter=5)
-        elements.append(Paragraph(spare_parts, spare_style))
+    # Observaciones
+    elements.append(Paragraph("OBSERVACIONES", section_style))
+    elements.append(Spacer(1, 2*mm))
     
     observations = equipment_data.get('observations', '')
-    if observations and observations.strip():
-        elements.append(Paragraph("OBSERVACIONES", heading_style))
-        obs_style = ParagraphStyle('Obs', parent=styles['Normal'], fontSize=8, spaceAfter=5)
-        elements.append(Paragraph(observations, obs_style))
+    obs_data = [[Paragraph(observations if observations else "", info_style)]]
+    obs_table = Table(obs_data, colWidths=[180*mm])
+    obs_table.setStyle(TableStyle([
+        ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('LEFTPADDING', (0, 0), (-1, -1), 3),
+        ('RIGHTPADDING', (0, 0), (-1, -1), 3),
+        ('TOPPADDING', (0, 0), (-1, -1), 3),
+        ('BOTTOMPADDING', (0, 0), (-1, -1), 3),
+    ]))
+    elements.append(obs_table)
+    elements.append(Spacer(1, 5*mm))
     
-    elements.append(Spacer(1, 0.4*cm))
+    # Firma del Técnico (sin supervisor)
+    elements.append(Paragraph("FIRMAS Y SELLO", section_style))
+    elements.append(Spacer(1, 3*mm))
     
-    # Firmas compactas
     signature_data = [
         ["", ""],
-        ["_______________________", "_______________________"],
-        ["Técnico", "Supervisor"],
-        [equipment_data.get('technician', ''), ""]
+        ["", ""],
+        ["", ""],
+        [Paragraph("<b>Operario:</b>", info_style), ""],
+        [Paragraph(equipment_data.get('technician', ''), info_style), ""]
     ]
     
-    signature_table = Table(signature_data, colWidths=[8.5*cm, 8.5*cm])
+    signature_table = Table(signature_data, colWidths=[90*mm, 90*mm])
     signature_table.setStyle(TableStyle([
-        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
-        ('FONTNAME', (0, 2), (-1, 2), 'Helvetica-Bold'),
-        ('FONTSIZE', (0, 0), (-1, -1), 9),
-        ('TOPPADDING', (0, 1), (-1, 1), 15),
-        ('BOTTOMPADDING', (0, 1), (-1, 1), 3),
+        ('LINEABOVE', (0, 3), (0, 3), 1, colors.black),
+        ('ALIGN', (0, 3), (-1, -1), 'CENTER'),
+        ('TOPPADDING', (0, 3), (-1, 3), 15),
     ]))
     elements.append(signature_table)
     
-    # Pie de página
-    elements.append(Spacer(1, 0.3*cm))
+    # Footer
+    elements.append(Spacer(1, 5*mm))
+    footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=7, alignment=TA_CENTER)
     footer_text = f"Fecha de emisión: {datetime.now().strftime('%d/%m/%Y')}"
-    footer_style = ParagraphStyle('Footer', parent=styles['Normal'], fontSize=7, textColor=colors.grey, alignment=TA_CENTER)
     elements.append(Paragraph(footer_text, footer_style))
     
     # Construir el PDF
