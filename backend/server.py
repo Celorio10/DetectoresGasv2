@@ -477,6 +477,7 @@ async def deliver_equipment(delivery: DeliveryUpdate, current_user: dict = Depen
         # Generar número de certificado único para cada equipo
         certificate_number = await generate_certificate_number()
         
+        # Actualizar equipo con datos de entrega y certificado
         await db.equipment.update_one(
             {"serial_number": serial},
             {"$set": {
@@ -487,6 +488,16 @@ async def deliver_equipment(delivery: DeliveryUpdate, current_user: dict = Depen
                 "certificate_number": certificate_number
             }}
         )
+        
+        # Actualizar historial con número de certificado y albarán
+        await db.calibration_history.update_many(
+            {"serial_number": serial, "certificate_number": None},
+            {"$set": {
+                "delivery_note": delivery.delivery_note,
+                "certificate_number": certificate_number
+            }}
+        )
+        
     return {"message": f"{len(delivery.serial_numbers)} equipment delivered"}
 
 @api_router.get("/equipment/delivered", response_model=List[Equipment])
