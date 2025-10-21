@@ -157,7 +157,7 @@ class EquipmentCreate(BaseModel):
 
 class CalibrationUpdate(BaseModel):
     calibration_data: List[SensorCalibration]
-    spare_parts: str = ""
+    spare_parts: List[SparePart] = []
     calibration_date: str
     technician: str
 
