@@ -108,7 +108,7 @@ export default function EquipmentReview() {
       }
       
       // Reset otros campos para nueva calibración
-      setSpareParts("");
+      setSpareParts([]);
       setCalibrationDate(new Date().toISOString().split('T')[0]);
       setSelectedTechnician("");
       
