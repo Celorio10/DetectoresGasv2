@@ -258,6 +258,13 @@ async def create_technician(technician: Technician, current_user: dict = Depends
     return technician
 
 # Equipment routes
+@api_router.get("/equipment-catalog/serial/{serial_number}", response_model=Optional[EquipmentCatalog])
+async def get_equipment_catalog_by_serial(serial_number: str, current_user: dict = Depends(get_current_user)):
+    catalog_entry = await db.equipment_catalog.find_one({"serial_number": serial_number}, {"_id": 0})
+    if not catalog_entry:
+        return None
+    return catalog_entry
+
 @api_router.post("/equipment", response_model=Equipment)
 async def create_equipment(equipment_data: EquipmentCreate, current_user: dict = Depends(get_current_user)):
     existing = await db.equipment.find_one({"serial_number": equipment_data.serial_number, "status": {"$ne": "delivered"}})
@@ -266,6 +273,24 @@ async def create_equipment(equipment_data: EquipmentCreate, current_user: dict =
     
     equipment = Equipment(**equipment_data.model_dump())
     await db.equipment.insert_one(equipment.model_dump())
+    
+    # Update or create equipment catalog entry
+    catalog_entry = EquipmentCatalog(
+        serial_number=equipment_data.serial_number,
+        brand=equipment_data.brand,
+        model=equipment_data.model,
+        client_name=equipment_data.client_name,
+        client_cif=equipment_data.client_cif,
+        client_departamento=equipment_data.client_departamento,
+        last_entry_date=equipment_data.entry_date
+    )
+    
+    await db.equipment_catalog.update_one(
+        {"serial_number": equipment_data.serial_number},
+        {"$set": catalog_entry.model_dump()},
+        upsert=True
+    )
+    
     return equipment
 
 @api_router.get("/equipment/serial/{serial_number}", response_model=Equipment)
