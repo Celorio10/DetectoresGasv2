@@ -230,9 +230,38 @@ export default function EquipmentExit() {
                               {/* Repuestos Utilizados */}
                               <div>
                                 <h3 className="font-bold text-sm mb-2">Repuestos Utilizados</h3>
-                                <div className="bg-white border rounded p-3">
-                                  <p className="text-sm">{item.spare_parts || 'Ninguno'}</p>
-                                </div>
+                                {item.spare_parts && item.spare_parts.length > 0 ? (
+                                  <div className="overflow-x-auto">
+                                    <table className="w-full text-sm border">
+                                      <thead className="bg-gray-100">
+                                        <tr>
+                                          <th className="border p-2 text-left">Descripción</th>
+                                          <th className="border p-2 text-left">Referencia</th>
+                                          <th className="border p-2 text-center">Garantía</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="bg-white">
+                                        {item.spare_parts.map((part, idx) => (
+                                          <tr key={idx}>
+                                            <td className="border p-2">{part.descripcion}</td>
+                                            <td className="border p-2">{part.referencia}</td>
+                                            <td className="border p-2 text-center">
+                                              {part.garantia && (
+                                                <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                                  GARANTÍA
+                                                </span>
+                                              )}
+                                            </td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                ) : (
+                                  <div className="bg-white border rounded p-3">
+                                    <p className="text-sm text-gray-500">Ninguno</p>
+                                  </div>
+                                )}
                               </div>
 
                               {/* Observaciones */}
