@@ -286,20 +286,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Agregar campo departamento al modelo Client"
-    - "Agregar campos valor_zero y valor_span al modelo SensorCalibration"
-    - "Crear modelo EquipmentCatalog para persistencia de equipos"
-    - "Endpoint para obtener equipo del catálogo por serial"
-    - "Actualizar endpoint de creación de equipos para guardar en catálogo"
+    - "Implementar descarga automática de certificado PDF después de calibración"
     - "Agregar campo Departamento al formulario de cliente en EquipmentEntry"
     - "Implementar auto-completado de equipos por número de serie"
     - "Agregar columnas Valor de Zero y Valor de SPAN en tabla de calibración"
-    - "Implementar descarga automática de certificado PDF después de calibración"
-    - "Crear módulo de generación de PDF con ReportLab"
-    - "Endpoint para generar y descargar certificado PDF"
-    - "Guardar logo de empresa ASCONSA"
   stuck_tasks: []
-  test_all: true
+  test_all: false
   test_priority: "high_first"
 
 agent_communication:
