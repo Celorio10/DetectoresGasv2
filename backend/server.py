@@ -439,6 +439,15 @@ async def download_certificate(serial_number: str, current_user: dict = Depends(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating PDF: {str(e)}")
 
+@api_router.get("/calibration-history/all", response_model=List[CalibrationHistory])
+async def get_all_calibration_history(current_user: dict = Depends(get_current_user)):
+    """Obtener todo el historial de calibraciones"""
+    history = await db.calibration_history.find(
+        {}, 
+        {"_id": 0}
+    ).sort("calibration_date", -1).to_list(10000)
+    return history
+
 @api_router.get("/equipment/{serial_number}/history", response_model=List[CalibrationHistory])
 async def get_equipment_history(serial_number: str, current_user: dict = Depends(get_current_user)):
     """Obtener historial de calibraciones de un equipo"""
