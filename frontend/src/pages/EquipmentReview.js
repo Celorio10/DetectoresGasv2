@@ -34,7 +34,8 @@ export default function EquipmentReview() {
     calibration_bottle: "",
     approved: false
   }]);
-  const [spareParts, setSpareParts] = useState("");
+  const [spareParts, setSpareParts] = useState([]);
+  const [newSparePart, setNewSparePart] = useState({ descripcion: "", referencia: "", garantia: false });
   const [calibrationDate, setCalibrationDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedTechnician, setSelectedTechnician] = useState("");
   const [newTechnician, setNewTechnician] = useState("");
