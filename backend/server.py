@@ -70,7 +70,7 @@ class Client(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
     cif: str
-    departamento: str = ""
+    departamentos: List[str] = Field(default_factory=list)
 
 class Technician(BaseModel):
     model_config = ConfigDict(extra="ignore")
