@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import Layout from "../components/Layout";
-import { PackageOpen } from "lucide-react";
+import { PackageOpen, ChevronDown, ChevronUp } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -18,6 +18,7 @@ const getAuthHeaders = () => ({
 export default function EquipmentExit() {
   const [equipment, setEquipment] = useState([]);
   const [selectedEquipment, setSelectedEquipment] = useState([]);
+  const [expandedEquipment, setExpandedEquipment] = useState(null);
   const [deliveryNote, setDeliveryNote] = useState("");
   const [deliveryLocation, setDeliveryLocation] = useState("");
   const [deliveryDate, setDeliveryDate] = useState(new Date().toISOString().split('T')[0]);
