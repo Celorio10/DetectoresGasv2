@@ -40,7 +40,9 @@ def generate_certificate_pdf(equipment_data, output_path):
     
     # Logo ASCONSA izquierda
     if os.path.exists(logo_path):
-        logo_asconsa = Image(str(logo_path), width=50*mm, height=25*mm)
+        # Mantener aspect ratio del logo - solo especificar ancho
+        logo_asconsa = Image(str(logo_path), width=55*mm)
+        logo_asconsa.hAlign = 'LEFT'
         header_row.append(logo_asconsa)
     else:
         header_row.append(Paragraph("ASCONSA", styles['Heading1']))
