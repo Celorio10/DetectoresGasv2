@@ -80,6 +80,8 @@ class SensorCalibration(BaseModel):
     pre_alarm: str
     alarm: str
     calibration_value: str
+    valor_zero: str = ""
+    valor_span: str = ""
     calibration_bottle: str
     approved: bool
 
