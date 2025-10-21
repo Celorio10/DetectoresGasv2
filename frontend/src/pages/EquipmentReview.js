@@ -359,6 +359,8 @@ export default function EquipmentReview() {
                       <th className="text-left p-2 text-sm font-semibold">Pre-Alarma</th>
                       <th className="text-left p-2 text-sm font-semibold">Alarma</th>
                       <th className="text-left p-2 text-sm font-semibold">Valor Calibración</th>
+                      <th className="text-left p-2 text-sm font-semibold">Valor de Zero</th>
+                      <th className="text-left p-2 text-sm font-semibold">Valor de SPAN</th>
                       <th className="text-left p-2 text-sm font-semibold">Botella</th>
                       <th className="text-left p-2 text-sm font-semibold">APTO</th>
                       <th className="text-left p-2 text-sm font-semibold">Acción</th>
