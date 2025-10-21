@@ -26,13 +26,14 @@ export default function EquipmentEntry() {
     model: "",
     client_name: "",
     client_cif: "",
+    client_departamento: "",
     serial_number: "",
     observations: "",
     entry_date: new Date().toISOString().split('T')[0]
   });
   const [newBrand, setNewBrand] = useState("");
   const [newModel, setNewModel] = useState("");
-  const [newClient, setNewClient] = useState({ name: "", cif: "" });
+  const [newClient, setNewClient] = useState({ name: "", cif: "", departamento: "" });
   const [loading, setLoading] = useState(false);
   const [brandDialogOpen, setBrandDialogOpen] = useState(false);
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
