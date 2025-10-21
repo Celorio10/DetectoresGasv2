@@ -372,7 +372,7 @@ async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate
     update_data = {
         "status": "calibrated",
         "calibration_data": [item.model_dump() for item in calibration.calibration_data],
-        "spare_parts": calibration.spare_parts,
+        "spare_parts": [item.model_dump() for item in calibration.spare_parts] if calibration.spare_parts else [],
         "calibration_date": calibration.calibration_date,
         "technician": calibration.technician
     }
