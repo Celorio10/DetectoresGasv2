@@ -190,6 +190,41 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
     except jwt.JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
+# Certificate number generation
+async def generate_certificate_number():
+    """
+    Genera un número de certificado correlativo en formato YY-NNNNN
+    donde YY son los dos últimos dígitos del año actual
+    y NNNNN es un número correlativo de 5 dígitos (00001-99999)
+    """
+    current_year = datetime.now().year
+    year_suffix = str(current_year)[-2:]  # Últimos 2 dígitos del año
+    
+    # Buscar el último certificado del año actual
+    counter_doc = await db.certificate_counters.find_one({"year": current_year})
+    
+    if counter_doc:
+        # Incrementar el contador existente
+        new_counter = counter_doc['counter'] + 1
+        if new_counter > 99999:
+            raise HTTPException(status_code=500, detail="Se ha alcanzado el límite de certificados para este año")
+        
+        await db.certificate_counters.update_one(
+            {"year": current_year},
+            {"$set": {"counter": new_counter}}
+        )
+    else:
+        # Crear nuevo contador para el año
+        new_counter = 1
+        await db.certificate_counters.insert_one({
+            "year": current_year,
+            "counter": new_counter
+        })
+    
+    # Formatear el número: YY-NNNNN
+    certificate_number = f"{year_suffix}-{new_counter:05d}"
+    return certificate_number
+
 # Auth routes
 @api_router.post("/auth/register", response_model=User)
 async def register(user_data: UserRegister):
