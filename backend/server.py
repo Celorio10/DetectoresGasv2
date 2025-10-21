@@ -137,7 +137,7 @@ class Equipment(BaseModel):
     entry_date: str
     status: str = "pending"  # pending, calibrated, delivered
     calibration_data: Optional[List[SensorCalibration]] = None
-    spare_parts: Optional[str] = None
+    spare_parts: Optional[List[SparePart]] = None
     calibration_date: Optional[str] = None
     technician: Optional[str] = None
     delivery_note: Optional[str] = None
