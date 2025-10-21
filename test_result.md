@@ -110,63 +110,78 @@ user_problem_statement: |
 backend:
   - task: "Agregar campo departamento al modelo Client"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Campo 'departamento' agregado al modelo Client (línea 71)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Campo departamento funciona correctamente. Cliente creado con departamento 'Mantenimiento' se guarda y persiste correctamente en la base de datos."
 
   - task: "Agregar campos valor_zero y valor_span al modelo SensorCalibration"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Campos 'valor_zero' y 'valor_span' agregados al modelo SensorCalibration (líneas 83-84)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Campos valor_zero y valor_span funcionan correctamente. Calibración con valores '0' y '100' se guarda y persiste correctamente. Datos verificados en GET /api/equipment/serial/{serial}."
 
   - task: "Crear modelo EquipmentCatalog para persistencia de equipos"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Modelo EquipmentCatalog creado con serial_number, brand, model, client_name, client_cif, client_departamento (líneas 77-85)"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Modelo EquipmentCatalog funciona correctamente. Equipos se guardan automáticamente en catálogo con todos los campos requeridos incluyendo client_departamento."
 
   - task: "Endpoint para obtener equipo del catálogo por serial"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Endpoint GET /api/equipment-catalog/serial/{serial_number} creado para obtener datos históricos del equipo"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Endpoint GET /api/equipment-catalog/serial/{serial_number} funciona correctamente. Retorna todos los campos requeridos: serial_number, brand, model, client_name, client_cif, client_departamento. Probado con serial 'SN-TEST-001'."
 
   - task: "Actualizar endpoint de creación de equipos para guardar en catálogo"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "POST /api/equipment actualizado para guardar/actualizar entrada en equipment_catalog usando upsert"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: POST /api/equipment funciona correctamente. Equipo se crea en colección equipment y automáticamente se guarda/actualiza en equipment_catalog usando upsert. Verificado que el catálogo contiene todos los datos del equipo."
 
 frontend:
   - task: "Agregar campo Departamento al formulario de cliente en EquipmentEntry"
