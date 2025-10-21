@@ -272,7 +272,7 @@ export default function EquipmentReview() {
         calibration_bottle: "",
         approved: false
       }]);
-      setSpareParts("");
+      setSpareParts([]);
       setSelectedTechnician("");
       // Recargar lista de equipos pendientes
       loadPendingEquipment();
