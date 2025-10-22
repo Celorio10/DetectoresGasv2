@@ -192,57 +192,51 @@ export default function EquipmentHistory() {
                 <tbody>
                   {equipments.map((equipment) => (
                     <>
+                      {/* Fila principal del equipo */}
                       <tr 
-                        key={item.id} 
-                        className="border-b hover:bg-gray-50 transition-colors"
-                        data-testid={`history-row-${item.id}`}
+                        key={equipment.serial_number} 
+                        className="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                        onClick={() => handleToggleExpand(equipment.serial_number)}
                       >
                         <td className="p-3">
                           <Button
                             variant="ghost"
                             size="sm"
-                            onClick={() => handleToggleExpand(item.id)}
-                            data-testid={`expand-history-${item.id}`}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleToggleExpand(equipment.serial_number);
+                            }}
                           >
-                            {expandedHistory === item.id ? (
+                            {expandedEquipment === equipment.serial_number ? (
                               <ChevronUp className="w-4 h-4" />
                             ) : (
                               <ChevronDown className="w-4 h-4" />
                             )}
                           </Button>
                         </td>
-                        <td className="p-3" data-testid={`history-date-${item.id}`}>
-                          {item.calibration_date}
-                        </td>
-                        <td className="p-3 font-semibold">{item.serial_number}</td>
-                        <td className="p-3">{item.brand}</td>
-                        <td className="p-3">{item.model}</td>
-                        <td className="p-3">{item.client_name}</td>
-                        <td className="p-3">{item.client_departamento || 'N/A'}</td>
-                        <td className="p-3">{item.technician}</td>
-                        <td className="p-3 text-center">
-                          <span 
-                            className={`px-3 py-1 rounded-full text-xs font-semibold ${getEstadoColor(item.calibration_data)}`}
-                            data-testid={`history-status-${item.id}`}
-                          >
-                            {getEstadoText(item.calibration_data)}
+                        <td className="p-3 font-semibold text-blue-600">{equipment.serial_number}</td>
+                        <td className="p-3">{equipment.brand}</td>
+                        <td className="p-3">{equipment.model}</td>
+                        <td className="p-3">{equipment.client_name}</td>
+                        <td className="p-3">{equipment.client_departamento || 'N/A'}</td>
+                      </tr>
+                      
+                      {/* Fila con fecha de última calibración */}
+                      <tr className="border-b bg-gray-50">
+                        <td></td>
+                        <td colSpan="5" className="p-2 text-sm text-gray-600">
+                          📅 Última calibración: <span className="font-semibold">{equipment.last_calibration_date}</span>
+                          <span className="ml-4">
+                            ({equipment.calibrations.length} calibración{equipment.calibrations.length !== 1 ? 'es' : ''} registrada{equipment.calibrations.length !== 1 ? 's' : ''})
                           </span>
                         </td>
-                        <td className="p-3 text-center">
-                          <Button 
-                            size="sm" 
-                            onClick={() => handleDownloadCertificate(item.id, item.serial_number, item.calibration_date)}
-                            data-testid={`download-certificate-${item.id}`}
-                            className="bg-purple-600 hover:bg-purple-700"
-                          >
-                            <Download className="w-4 h-4 mr-1" />
-                            Descargar
-                          </Button>
-                        </td>
                       </tr>
-                      {expandedHistory === item.id && (
+
+                      {/* Historial de calibraciones expandido */}
+                      {expandedEquipment === equipment.serial_number && (
                         <tr className="bg-blue-50">
-                          <td colSpan="10" className="p-4">
+                          <td></td>
+                          <td colSpan="5" className="p-4">
                             <div className="space-y-4">
                               {/* Tabla de Calibración */}
                               <div>
