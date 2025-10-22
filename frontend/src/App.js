@@ -3,6 +3,7 @@ import "@/App.css";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
+import EquipmentMasterCatalog from "./pages/EquipmentMasterCatalog";
 import EquipmentEntry from "./pages/EquipmentEntry";
 import EquipmentReview from "./pages/EquipmentReview";
 import EquipmentExit from "./pages/EquipmentExit";
