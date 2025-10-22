@@ -301,13 +301,10 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Implementar descarga automática de certificado PDF después de calibración"
-    - "Agregar campo Departamento al formulario de cliente en EquipmentEntry"
-    - "Implementar auto-completado de equipos por número de serie"
-    - "Agregar columnas Valor de Zero y Valor de SPAN en tabla de calibración"
+    - "Ajustar tamaño del logo ASCONSA en PDF a dimensiones óptimas"
   stuck_tasks: []
   test_all: false
-  test_priority: "high_first"
+  test_priority: "critical_first"
 
 agent_communication:
   - agent: "main"
