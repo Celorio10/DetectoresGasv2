@@ -371,7 +371,7 @@ export default function EquipmentHistory() {
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center">
             <History className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-600" data-testid="no-history">
-              No hay historial de calibraciones aún
+              No se encontraron equipos con los filtros especificados
             </p>
           </div>
         )}
