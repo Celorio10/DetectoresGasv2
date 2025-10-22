@@ -19,11 +19,15 @@ const getAuthHeaders = () => ({
 
 export default function EquipmentMasterCatalog() {
   const [equipments, setEquipments] = useState([]);
+  const [brands, setBrands] = useState([]);
+  const [models, setModels] = useState([]);
   const [clients, setClients] = useState([]);
   const [selectedClientDepartamentos, setSelectedClientDepartamentos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
+  const [brandDialogOpen, setBrandDialogOpen] = useState(false);
+  const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentEquipment, setCurrentEquipment] = useState(null);
   
