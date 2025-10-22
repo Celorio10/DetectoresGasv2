@@ -674,7 +674,7 @@ export default function EquipmentEntry() {
               {loading ? 'Guardando...' : 'Registrar Equipo'}
             </Button>
           </form>
-        </div>
+        )}
       </div>
     </Layout>
   );
