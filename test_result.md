@@ -303,8 +303,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Ajustar tamaño del logo ASCONSA en PDF a dimensiones óptimas"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
