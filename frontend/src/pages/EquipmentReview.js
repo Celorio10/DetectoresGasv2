@@ -125,25 +125,29 @@ export default function EquipmentReview() {
     setSelectedEquipmentId(selectedEquip.id);
     setSearchSerial(selectedEquip.serial_number);
     
-    // Cargar sensores de la última calibración desde el catálogo
+    // Cargar sensores predeterminados desde el catálogo maestro
     try {
-      const catalogResponse = await axios.get(`${API}/equipment-catalog/serial/${selectedEquip.serial_number}`, getAuthHeaders());
-      if (catalogResponse.data && catalogResponse.data.last_calibration_data && catalogResponse.data.last_calibration_data.length > 0) {
-        // Solo cargar Sensor, Pre-Alarma y Alarma. SPAN, ZERO y Botella siempre vacíos
-        const sensorsWithResetFields = catalogResponse.data.last_calibration_data.map(sensor => ({
+      const masterCatalogResponse = await axios.get(
+        `${API}/equipment-master/${selectedEquip.serial_number}`, 
+        getAuthHeaders()
+      );
+      
+      if (masterCatalogResponse.data && masterCatalogResponse.data.default_sensors && masterCatalogResponse.data.default_sensors.length > 0) {
+        // Cargar sensores predeterminados del catálogo maestro
+        const sensorsFromMaster = masterCatalogResponse.data.default_sensors.map(sensor => ({
           sensor: sensor.sensor || "",
           pre_alarm: sensor.pre_alarm || "",
           alarm: sensor.alarm || "",
           calibration_value: sensor.calibration_value || "",
-          valor_zero: "",  // Siempre vacío
-          valor_span: "",  // Siempre vacío
-          calibration_bottle: "",  // Siempre vacío
+          valor_zero: "",  // Siempre vacío para nueva calibración
+          valor_span: "",  // Siempre vacío para nueva calibración
+          calibration_bottle: "",  // Siempre vacío para nueva calibración
           approved: false
         }));
-        setCalibrationData(sensorsWithResetFields);
-        toast.info('Sensores de última calibración cargados');
+        setCalibrationData(sensorsFromMaster);
+        toast.info(`${sensorsFromMaster.length} sensores predeterminados cargados del catálogo`);
       } else {
-        // Reset calibration data para nuevo equipo
+        // Si no hay sensores predeterminados, iniciar con tabla vacía
         setCalibrationData([{
           sensor: "",
           pre_alarm: "",
@@ -154,9 +158,11 @@ export default function EquipmentReview() {
           calibration_bottle: "",
           approved: false
         }]);
+        toast.info('Equipo sin sensores predeterminados. Completa los datos manualmente.');
       }
     } catch (catalogError) {
-      // Si no hay datos en catálogo, iniciar con tabla vacía
+      // Si no hay datos en catálogo maestro, iniciar con tabla vacía
+      console.log('No se encontró el equipo en catálogo maestro:', catalogError);
       setCalibrationData([{
         sensor: "",
         pre_alarm: "",
