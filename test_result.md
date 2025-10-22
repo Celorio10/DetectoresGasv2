@@ -613,3 +613,31 @@ agent_communication:
       - Equipo "00000" solo en Salida
       - Equipo "1111" solo en Salida
       - Ninguno aparece en Revisión
+  - agent: "main"
+    message: |
+      🎯 CAUSA RAÍZ DEFINITIVA ENCONTRADA Y CORREGIDA
+      
+      PROBLEMA IDENTIFICADO:
+      Usuario reporta flujo: Ingreso equipo → Calibro → Equipo NO desaparece de Revisión
+      
+      CAUSA TÉCNICA:
+      Cuando existen múltiples equipos con el mismo serial_number (ej: 1 delivered + 1 pending):
+      - Endpoint PUT /equipment/{serial}/calibrate usaba: update_one({"serial_number": serial})
+      - Endpoint PUT /equipment/deliver usaba: update_one({"serial_number": serial})
+      - MongoDB actualiza el PRIMER documento que coincide → Equipo INCORRECTO
+      - Resultado: Se actualizaba el equipo "delivered" en vez del "pending"
+      
+      SOLUCIÓN IMPLEMENTADA:
+      1. ✅ Modificado endpoint calibrate (líneas 374-391):
+         - Busca equipo con {"serial_number": X, "status": {"$ne": "delivered"}}
+         - Actualiza usando ID específico: update_one({"id": equipment['id']})
+      
+      2. ✅ Modificado endpoint deliver (líneas 503-523):
+         - Busca equipo con {"serial_number": X, "status": "calibrated"}
+         - Actualiza usando ID específico: update_one({"id": equipment['id']})
+      
+      TESTING REQUERIDO:
+      1. Crear equipo de prueba TEST-DEBUG-001 (ya creado en BD)
+      2. Ir a Revisión y calibrar TEST-DEBUG-001
+      3. Verificar que desaparece de Revisión inmediatamente
+      4. Verificar que aparece en Salida
