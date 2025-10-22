@@ -354,19 +354,95 @@ export default function EquipmentMasterCatalog() {
                   </div>
                   <div>
                     <Label>Marca *</Label>
-                    <Input
-                      value={formData.brand}
-                      onChange={(e) => setFormData({...formData, brand: e.target.value})}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <Select 
+                        value={formData.brand}
+                        onValueChange={(value) => setFormData({...formData, brand: value})}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Selecciona marca" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {brands.map((brand) => (
+                            <SelectItem key={brand.id} value={brand.name}>
+                              {brand.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Dialog open={brandDialogOpen} onOpenChange={setBrandDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button type="button" variant="outline" size="sm">
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Añadir Nueva Marca</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label>Nombre de la Marca</Label>
+                              <Input
+                                value={newBrand}
+                                onChange={(e) => setNewBrand(e.target.value)}
+                                placeholder="Ej: MSA, Honeywell"
+                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddBrand())}
+                              />
+                            </div>
+                            <Button type="button" onClick={handleAddBrand} className="w-full">
+                              Guardar Marca
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                   <div>
                     <Label>Modelo *</Label>
-                    <Input
-                      value={formData.model}
-                      onChange={(e) => setFormData({...formData, model: e.target.value})}
-                      required
-                    />
+                    <div className="flex gap-2">
+                      <Select 
+                        value={formData.model}
+                        onValueChange={(value) => setFormData({...formData, model: value})}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Selecciona modelo" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {models.map((model) => (
+                            <SelectItem key={model.id} value={model.name}>
+                              {model.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Dialog open={modelDialogOpen} onOpenChange={setModelDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button type="button" variant="outline" size="sm">
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Añadir Nuevo Modelo</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label>Nombre del Modelo</Label>
+                              <Input
+                                value={newModel}
+                                onChange={(e) => setNewModel(e.target.value)}
+                                placeholder="Ej: ALTAIR 4X, XT-2000"
+                                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddModel())}
+                              />
+                            </div>
+                            <Button type="button" onClick={handleAddModel} className="w-full">
+                              Guardar Modelo
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </div>
                   </div>
                 </div>
 
