@@ -413,3 +413,24 @@ agent_communication:
       ✅ PDF guardado en /app/backend/temp_pdfs/ y disponible para descarga
       
       🚀 FASE 2 COMPLETAMENTE FUNCIONAL - BACKEND PDF GENERATION WORKING 100%
+  - agent: "main"
+    message: |
+      🔧 FIX CRÍTICO: AJUSTE DE TAMAÑO DE LOGO EN PDF
+      
+      PROBLEMA REPORTADO POR USUARIO:
+      - Error al registrar salida de equipo y generar certificado PDF
+      - Logo ASCONSA demasiado grande (510 x 1778 points) causando page overflow
+      - Error: "Flowable <Table> with cell(0,0) containing Image, tallest cell 1778.0 points, too large on page"
+      
+      SOLUCIÓN IMPLEMENTADA:
+      - Archivo modificado: /app/backend/pdf_generator.py (línea 44)
+      - Cambio: Logo ahora usa dimensiones específicas (width Y height)
+      - Dimensiones óptimas aplicadas: 7.15cm x 1.93cm (71.5mm x 19.3mm)
+      - Antes: Image(str(logo_path), width=55*mm) [solo ancho, altura automática causaba deformación]
+      - Después: Image(str(logo_path), width=71.5*mm, height=19.3*mm) [dimensiones controladas]
+      
+      TESTING REQUERIDO:
+      1. Probar flujo completo de registro de salida de equipo con generación de PDF
+      2. Verificar que el PDF se genere sin errores de overflow
+      3. Confirmar que el logo aparece en tamaño correcto sin deformación
+      4. Validar que todos los elementos del certificado se mantienen en una sola página
