@@ -249,6 +249,12 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Agregado delay de 500ms antes de recargar la lista de equipos pendientes (loadPendingEquipment) para asegurar sincronización correcta del estado de React después de calibrar."
+      - working: false
+        agent: "user"
+        comment: "Problema persiste: Equipo con serial 00000 aparece tanto en Salida como en Revisión."
+      - working: "NA"
+        agent: "main"
+        comment: "CAUSA RAÍZ IDENTIFICADA: Hay DOS equipos diferentes con el mismo serial '00000' en la base de datos - uno 'calibrated' y otro 'pending'. Eliminado el duplicado pendiente. Validación de unicidad ya existe en backend (línea 333-335 de server.py)."
 
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
