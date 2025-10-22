@@ -318,6 +318,12 @@ frontend:
       - working: true
         agent: "testing"
         comment: "✅ TESTED: Campo internal_notes funciona correctamente. Calibración con notas internas 'Calibración realizada sin problemas. Sensores funcionando correctamente.' se guarda y persiste en calibration_history. Verificado en historial individual del equipo."
+      - working: false
+        agent: "user"
+        comment: "PROBLEMA: Notas internas no aparecen en pestaña Historial. Numeración de calibraciones al revés (última calibración muestra '#1')."
+      - working: true
+        agent: "main"
+        comment: "SOLUCIONADO: 1) Endpoint /calibration-history/search no incluía 'internal_notes' en respuesta. Agregado en línea 621. 2) Numeración corregida: ahora usa (calIdx + 1) en vez de (length - calIdx). Calibración más reciente ahora es '#1' con etiqueta verde 'Más Reciente'."
 
   - task: "Flujo completo de calibración y aparición en Historial y Resumen"
     implemented: true
