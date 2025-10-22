@@ -492,7 +492,8 @@ async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate
         "calibration_data": [item.model_dump() for item in calibration.calibration_data],
         "spare_parts": [item.model_dump() for item in calibration.spare_parts] if calibration.spare_parts else [],
         "calibration_date": calibration.calibration_date,
-        "technician": calibration.technician
+        "technician": calibration.technician,
+        "internal_notes": calibration.internal_notes
     }
     
     # Actualizar usando el ID específico del equipo, no solo el serial_number
