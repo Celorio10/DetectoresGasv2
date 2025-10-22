@@ -255,6 +255,12 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "CAUSA RAÍZ IDENTIFICADA: Hay DOS equipos diferentes con el mismo serial '00000' en la base de datos - uno 'calibrated' y otro 'pending'. Eliminado el duplicado pendiente. Validación de unicidad ya existe en backend (línea 333-335 de server.py)."
+      - working: false
+        agent: "user"
+        comment: "Problema persiste con equipo '1111': También aparece en Revisión Y Salidas después de calibrar. Validación debería prevenir esto pero no funciona."
+      - working: true
+        agent: "main"
+        comment: "Eliminados TODOS los duplicados (00000 y 1111). Mejorada validación en backend para ser más explícita: ahora verifica status 'pending' Y 'calibrated' específicamente. Mensaje de error más descriptivo. No se encontraron más duplicados en el sistema."
 
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
