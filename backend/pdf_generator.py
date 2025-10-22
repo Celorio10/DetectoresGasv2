@@ -165,8 +165,8 @@ def generate_certificate_pdf(equipment_data, output_path):
             ]
             spare_rows.append(row)
         
-        # Mismo ancho total que tabla de calibración (167mm)
-        spare_table = Table(spare_rows, colWidths=[97*mm, 50*mm, 20*mm])
+        # Ancho ampliado para que textos quepan en una línea (185mm total)
+        spare_table = Table(spare_rows, colWidths=[110*mm, 55*mm, 20*mm])
         spare_table.setStyle(TableStyle([
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
             ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
