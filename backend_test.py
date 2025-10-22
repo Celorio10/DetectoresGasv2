@@ -344,6 +344,229 @@ class WorkshopAPITester:
             self.log_test("PDF Certificate Download", False, f"Exception: {str(e)}")
             return False, None
 
+def test_logo_fix_critical():
+    """Test CRITICAL LOGO FIX - Verify PDF generation without logo overflow error"""
+    print("🚀 TESTING CRÍTICO: Verificar fix de tamaño de logo en generación de PDF")
+    print("=" * 70)
+    print("CONTEXTO: Usuario reportó error al registrar salida de equipo")
+    print("ERROR: Logo demasiado grande (510x1778 points) causando page overflow")
+    print("FIX: Logo ajustado a 7.15cm x 1.93cm en pdf_generator.py línea 44")
+    print("=" * 70)
+    
+    tester = WorkshopAPITester()
+    
+    # Test authentication flow
+    print("\n📋 AUTHENTICATION")
+    print("-" * 20)
+    
+    reg_success, username = tester.test_auth_register()
+    if not reg_success:
+        print("❌ Registration failed, stopping tests")
+        return 1
+    
+    login_success = tester.test_auth_login(username)
+    if not login_success:
+        print("❌ Login failed, stopping tests")
+        return 1
+    
+    # WORKFLOW COMPLETO END-TO-END como especifica el usuario
+    print("\n📋 WORKFLOW COMPLETO END-TO-END")
+    print("-" * 35)
+    
+    # 1. Crear un nuevo cliente con departamento
+    print("🔧 1. Crear nuevo cliente con departamento")
+    client_data = {
+        "name": "Empresa Test Logo Fix",
+        "cif": "B12345678",
+        "departamento": "Seguridad Industrial"
+    }
+    client_success, _ = tester.run_test(
+        "Crear Cliente con Departamento",
+        "POST",
+        "clients",
+        200,
+        data=client_data
+    )
+    
+    if not client_success:
+        print("❌ Failed to create client, stopping test")
+        return 1
+    
+    # Crear brand y model necesarios
+    print("🔧 Crear brand Honeywell")
+    tester.run_test("Create Honeywell Brand", "POST", "brands", 200, data={"name": "Honeywell"})
+    
+    print("🔧 Crear model XT-1000")
+    tester.run_test("Create XT-1000 Model", "POST", "models", 200, data={"name": "XT-1000"})
+    
+    print("🔧 Crear technician")
+    tester.run_test("Create Technician", "POST", "technicians", 200, data={"name": "Carlos Rodríguez"})
+    
+    # 2. Crear un nuevo equipo asociado a ese cliente
+    print("🔧 2. Crear nuevo equipo asociado al cliente")
+    serial_number = f"SN-LOGO-FIX-{datetime.now().strftime('%H%M%S')}"
+    equipment_data = {
+        "brand": "Honeywell",
+        "model": "XT-1000",
+        "client_name": client_data["name"],
+        "client_cif": client_data["cif"],
+        "client_departamento": client_data["departamento"],
+        "serial_number": serial_number,
+        "observations": "Equipo para test crítico de logo fix",
+        "entry_date": datetime.now().strftime('%Y-%m-%d')
+    }
+    
+    equip_success, _ = tester.run_test(
+        "Crear Equipo para Test Logo Fix",
+        "POST",
+        "equipment",
+        200,
+        data=equipment_data
+    )
+    
+    if not equip_success:
+        print("❌ Failed to create equipment, stopping test")
+        return 1
+    
+    # 3. Calibrar el equipo con al menos 2 sensores (CO, H2S) incluyendo valores Zero/SPAN
+    print("🔧 3. Calibrar equipo con 2 sensores (CO, H2S) + valores Zero/SPAN")
+    calibration_data = {
+        "calibration_data": [
+            {
+                "sensor": "CO (Monóxido de Carbono)",
+                "pre_alarm": "25 ppm",
+                "alarm": "50 ppm", 
+                "calibration_value": "100 ppm",
+                "valor_zero": "0 ppm",
+                "valor_span": "100 ppm",
+                "calibration_bottle": "BOT-CO-001",
+                "approved": True
+            },
+            {
+                "sensor": "H2S (Sulfuro de Hidrógeno)",
+                "pre_alarm": "5 ppm",
+                "alarm": "10 ppm",
+                "calibration_value": "25 ppm", 
+                "valor_zero": "0 ppm",
+                "valor_span": "25 ppm",
+                "calibration_bottle": "BOT-H2S-002",
+                "approved": True
+            }
+        ],
+        # 4. Agregar al menos 1 repuesto utilizado con garantía
+        "spare_parts": [
+            {
+                "descripcion": "Filtro de entrada",
+                "referencia": "FLT-001",
+                "garantia": True
+            }
+        ],
+        "calibration_date": datetime.now().strftime('%Y-%m-%d'),
+        "technician": "Carlos Rodríguez"
+    }
+    
+    calib_success, _ = tester.run_test(
+        "Calibrar Equipo con CO/H2S + Repuesto con Garantía",
+        "PUT",
+        f"equipment/{serial_number}/calibrate",
+        200,
+        data=calibration_data
+    )
+    
+    if not calib_success:
+        print("❌ Failed to calibrate equipment, stopping test")
+        return 1
+    
+    # 5. Registrar salida del equipo (delivery note + ubicación)
+    print("🔧 5. Registrar salida del equipo (delivery note + ubicación)")
+    delivery_data = {
+        "serial_numbers": [serial_number],
+        "delivery_note": f"DN-LOGO-FIX-{datetime.now().strftime('%H%M%S')}",
+        "delivery_location": "Planta Industrial Cliente",
+        "delivery_date": datetime.now().strftime('%Y-%m-%d')
+    }
+    
+    delivery_success, _ = tester.run_test(
+        "Registrar Salida de Equipo",
+        "PUT",
+        "equipment/deliver",
+        200,
+        data=delivery_data
+    )
+    
+    if not delivery_success:
+        print("❌ Failed to deliver equipment, stopping test")
+        return 1
+    
+    # 6. Generar certificado PDF mediante GET /api/equipment/{serial}/certificate
+    print("🔧 6. Generar certificado PDF - TEST CRÍTICO DEL LOGO FIX")
+    print("   Verificando que NO ocurra error: 'Logo demasiado grande (510x1778 points)'")
+    
+    pdf_success, pdf_content = tester.test_download_certificate_pdf(serial_number)
+    
+    if not pdf_success:
+        print("❌ CRITICAL FAILURE: PDF generation failed - Logo fix did not work!")
+        return 1
+    
+    # 7. Verificaciones específicas del fix
+    print("\n🔍 VERIFICACIONES ESPECÍFICAS DEL FIX")
+    print("-" * 40)
+    
+    # Verificar que PDF se genera sin errores de overflow
+    if pdf_content and len(pdf_content) > 1000:
+        tester.log_test("PDF sin errores de overflow", True, f"PDF generado exitosamente, tamaño: {len(pdf_content)} bytes")
+    else:
+        tester.log_test("PDF sin errores de overflow", False, "PDF demasiado pequeño o corrupto")
+        return 1
+    
+    # Verificar que archivo PDF es válido y tiene header correcto
+    try:
+        pdf_header = pdf_content[:8]
+        if pdf_header.startswith(b'%PDF-'):
+            tester.log_test("PDF válido con header correcto", True, f"Header: {pdf_header.decode('ascii', errors='ignore')}")
+        else:
+            tester.log_test("PDF válido con header correcto", False, f"Header inválido: {pdf_header}")
+            return 1
+    except Exception as e:
+        tester.log_test("PDF válido con header correcto", False, f"Error verificando header: {e}")
+        return 1
+    
+    # Verificar que tamaño del archivo es razonable (no excesivamente grande)
+    pdf_size_kb = len(pdf_content) / 1024
+    if 50 <= pdf_size_kb <= 2000:  # Entre 50KB y 2MB es razonable
+        tester.log_test("Tamaño de archivo razonable", True, f"Tamaño: {pdf_size_kb:.1f} KB")
+    else:
+        tester.log_test("Tamaño de archivo razonable", False, f"Tamaño anormal: {pdf_size_kb:.1f} KB")
+    
+    # Guardar PDF para inspección manual
+    try:
+        with open("/app/test_logo_fix_certificate.pdf", "wb") as f:
+            f.write(pdf_content)
+        print(f"   📁 PDF guardado como /app/test_logo_fix_certificate.pdf para inspección")
+    except Exception as e:
+        print(f"   ⚠️ No se pudo guardar PDF: {e}")
+    
+    # Print final results
+    print("\n" + "=" * 70)
+    print(f"📊 LOGO FIX TEST RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("=" * 70)
+    
+    # Print detailed results for failed tests
+    failed_tests = [test for test in tester.test_results if not test['success']]
+    if failed_tests:
+        print("\n❌ FAILED TESTS:")
+        for test in failed_tests:
+            print(f"   • {test['test']}: {test['details']}")
+    
+    if tester.tests_passed == tester.tests_run:
+        print("🎉 LOGO FIX SUCCESSFUL! PDF se genera sin error de overflow")
+        print("✅ El fix resuelve el problema reportado por el usuario")
+        return 0
+    else:
+        print(f"⚠️ LOGO FIX FAILED: {tester.tests_run - tester.tests_passed} tests failed")
+        print("❌ El fix NO resuelve completamente el problema")
+        return 1
+
 def test_fase2_pdf_generation():
     """Test FASE 2 - PDF Certificate Generation as specified in review request"""
     print("🚀 Starting FASE 2 - PDF Certificate Generation Tests")
