@@ -349,6 +349,19 @@ export default function EquipmentHistory() {
                                     )}
                                   </div>
 
+                                  {/* Notas Internas del Técnico */}
+                                  {calibration.internal_notes && (
+                                    <div className="mb-4 mt-4 border-t pt-4">
+                                      <h5 className="font-bold text-sm mb-2 flex items-center gap-2">
+                                        📝 Notas Internas del Técnico
+                                        <span className="text-xs font-normal text-gray-500">(No aparecen en certificado)</span>
+                                      </h5>
+                                      <div className="bg-yellow-50 border border-yellow-200 rounded p-3">
+                                        <p className="text-sm whitespace-pre-wrap">{calibration.internal_notes}</p>
+                                      </div>
+                                    </div>
+                                  )}
+
                                   {/* Estado General */}
                                   <div>
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getEstadoColor(calibration.calibration_data)}`}>
