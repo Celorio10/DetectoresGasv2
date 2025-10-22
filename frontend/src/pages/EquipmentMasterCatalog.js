@@ -55,6 +55,10 @@ export default function EquipmentMasterCatalog() {
   const [newClient, setNewClient] = useState({ name: "", cif: "", departamentos: [] });
   const [newDepartamento, setNewDepartamento] = useState("");
 
+  // Nuevas marca y modelo
+  const [newBrand, setNewBrand] = useState("");
+  const [newModel, setNewModel] = useState("");
+
   // Nuevo sensor
   const [newSensor, setNewSensor] = useState({
     sensor: "",
