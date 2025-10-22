@@ -86,6 +86,24 @@ export default function EquipmentMasterCatalog() {
     }
   };
 
+  const loadBrands = async () => {
+    try {
+      const response = await axios.get(`${API}/brands`, getAuthHeaders());
+      setBrands(response.data);
+    } catch (error) {
+      toast.error('Error al cargar marcas');
+    }
+  };
+
+  const loadModels = async () => {
+    try {
+      const response = await axios.get(`${API}/models`, getAuthHeaders());
+      setModels(response.data);
+    } catch (error) {
+      toast.error('Error al cargar modelos');
+    }
+  };
+
   const loadClients = async () => {
     try {
       const response = await axios.get(`${API}/clients`, getAuthHeaders());
@@ -93,6 +111,46 @@ export default function EquipmentMasterCatalog() {
     } catch (error) {
       toast.error('Error al cargar clientes');
     }
+  };
+
+  const handleAddBrand = async () => {
+    if (!newBrand.trim()) {
+      toast.error('Introduce el nombre de la marca');
+      return;
+    }
+    
+    setBrandDialogOpen(false);
+    
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/brands`, { name: newBrand }, getAuthHeaders());
+        toast.success('Marca añadida');
+        setNewBrand("");
+        loadBrands();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir marca');
+      }
+    }, 300);
+  };
+
+  const handleAddModel = async () => {
+    if (!newModel.trim()) {
+      toast.error('Introduce el nombre del modelo');
+      return;
+    }
+    
+    setModelDialogOpen(false);
+    
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/models`, { name: newModel }, getAuthHeaders());
+        toast.success('Modelo añadido');
+        setNewModel("");
+        loadModels();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir modelo');
+      }
+    }, 300);
   };
 
   const handleClientSelect = (clientId) => {
