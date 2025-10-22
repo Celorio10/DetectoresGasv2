@@ -344,6 +344,86 @@ async def create_technician(technician: Technician, current_user: dict = Depends
     await db.technicians.insert_one(technician.model_dump())
     return technician
 
+# Equipment Master Catalog routes
+@api_router.get("/equipment-master", response_model=List[EquipmentMaster])
+async def get_all_equipment_master(current_user: dict = Depends(get_current_user)):
+    """Obtener todos los equipos del catálogo maestro"""
+    equipment = await db.equipment_master.find({}, {"_id": 0}).sort("serial_number", 1).to_list(10000)
+    return equipment
+
+@api_router.get("/equipment-master/search")
+async def search_equipment_master(
+    serial: str = None,
+    marca: str = None,
+    modelo: str = None,
+    cliente: str = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """Buscar en el catálogo maestro con filtros"""
+    query = {}
+    if serial:
+        query["serial_number"] = {"$regex": serial, "$options": "i"}
+    if marca:
+        query["brand"] = {"$regex": marca, "$options": "i"}
+    if modelo:
+        query["model"] = {"$regex": modelo, "$options": "i"}
+    if cliente:
+        query["current_client_name"] = {"$regex": cliente, "$options": "i"}
+    
+    equipment = await db.equipment_master.find(query, {"_id": 0}).sort("serial_number", 1).to_list(10000)
+    return equipment
+
+@api_router.get("/equipment-master/{serial_number}", response_model=Optional[EquipmentMaster])
+async def get_equipment_master_by_serial(serial_number: str, current_user: dict = Depends(get_current_user)):
+    """Obtener equipo del catálogo maestro por número de serie"""
+    equipment = await db.equipment_master.find_one({"serial_number": serial_number}, {"_id": 0})
+    if not equipment:
+        return None
+    return equipment
+
+@api_router.post("/equipment-master", response_model=EquipmentMaster)
+async def create_equipment_master(equipment: EquipmentMaster, current_user: dict = Depends(get_current_user)):
+    """Crear nuevo equipo en catálogo maestro"""
+    # Verificar que no exista
+    existing = await db.equipment_master.find_one({"serial_number": equipment.serial_number})
+    if existing:
+        raise HTTPException(status_code=400, detail=f"Equipment with serial number '{equipment.serial_number}' already exists in master catalog")
+    
+    equipment_dict = equipment.model_dump()
+    # Convertir objetos SensorDefault a dict
+    equipment_dict['default_sensors'] = [sensor.model_dump() if hasattr(sensor, 'model_dump') else sensor for sensor in equipment.default_sensors]
+    
+    await db.equipment_master.insert_one(equipment_dict)
+    return equipment
+
+@api_router.put("/equipment-master/{serial_number}", response_model=EquipmentMaster)
+async def update_equipment_master(serial_number: str, equipment: EquipmentMaster, current_user: dict = Depends(get_current_user)):
+    """Actualizar equipo en catálogo maestro"""
+    existing = await db.equipment_master.find_one({"serial_number": serial_number})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Equipment not found in master catalog")
+    
+    equipment_dict = equipment.model_dump()
+    # Convertir objetos SensorDefault a dict
+    equipment_dict['default_sensors'] = [sensor.model_dump() if hasattr(sensor, 'model_dump') else sensor for sensor in equipment.default_sensors]
+    equipment_dict['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    await db.equipment_master.update_one(
+        {"serial_number": serial_number},
+        {"$set": equipment_dict}
+    )
+    
+    updated = await db.equipment_master.find_one({"serial_number": serial_number}, {"_id": 0})
+    return updated
+
+@api_router.delete("/equipment-master/{serial_number}")
+async def delete_equipment_master(serial_number: str, current_user: dict = Depends(get_current_user)):
+    """Eliminar equipo del catálogo maestro"""
+    result = await db.equipment_master.delete_one({"serial_number": serial_number})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Equipment not found in master catalog")
+    return {"message": "Equipment deleted from master catalog"}
+
 # Equipment routes
 @api_router.get("/equipment-catalog/serial/{serial_number}", response_model=Optional[EquipmentCatalog])
 async def get_equipment_catalog_by_serial(serial_number: str, current_user: dict = Depends(get_current_user)):
