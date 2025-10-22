@@ -63,11 +63,11 @@ export default function EquipmentHistory() {
     }, 100);
   };
 
-  const handleToggleExpand = (historyId) => {
-    if (expandedHistory === historyId) {
-      setExpandedHistory(null);
+  const handleToggleExpand = (serialNumber) => {
+    if (expandedEquipment === serialNumber) {
+      setExpandedEquipment(null);
     } else {
-      setExpandedHistory(historyId);
+      setExpandedEquipment(serialNumber);
     }
   };
 
