@@ -291,6 +291,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "Sistema de catálogo maestro implementado. Backend: modelo EquipmentMaster con sensores predeterminados (sensor, pre-alarma, alarma, valor calibración), endpoints CRUD completos. Frontend: nueva pestaña Catálogo con buscador, formulario completo, gestión de sensores predeterminados. Usa sistema de clientes existente con selector y modal para añadir nuevos clientes con departamentos."
+      - working: "NA"
+        agent: "main"
+        comment: "Agregados selectores de Marca y Modelo en Catálogo (igual que en Entrada). Ahora usa listas desplegables con opción de añadir nuevos mediante modales. Cargan de /api/brands y /api/models. Evita errores de escritura y mantiene consistencia."
 
   - task: "Simplificar Entrada de Taller con integración a catálogo maestro"
     implemented: true
