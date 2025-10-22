@@ -146,29 +146,78 @@ export default function EquipmentEntry() {
     });
   };
 
-  const handleSerialNumberChange = async (serialNumber) => {
-    setFormData({...formData, serial_number: serialNumber});
-    
-    if (serialNumber.trim().length > 0) {
-      try {
-        const response = await axios.get(`${API}/equipment-catalog/serial/${serialNumber}`, getAuthHeaders());
-        if (response.data) {
-          // Auto-complete form with catalog data
-          setFormData({
-            ...formData,
-            serial_number: serialNumber,
-            brand: response.data.brand,
-            model: response.data.model,
-            client_name: response.data.client_name,
-            client_cif: response.data.client_cif,
-            client_departamento: response.data.client_departamento || ""
-          });
-          toast.info('Datos del equipo cargados desde el catálogo');
-        }
-      } catch (error) {
-        // If not found in catalog, it's a new equipment - no error needed
-      }
+  const handleSearchEquipment = async () => {
+    if (!searchSerial.trim()) {
+      toast.error('Introduce un número de serie');
+      return;
     }
+
+    setLoading(true);
+    try {
+      const response = await axios.get(
+        `${API}/equipment-master/${searchSerial}`,
+        getAuthHeaders()
+      );
+      
+      if (response.data) {
+        // Equipo encontrado en catálogo maestro
+        setEquipmentFromCatalog(response.data);
+        setEquipmentNotFound(false);
+        setFormData({
+          ...formData,
+          serial_number: response.data.serial_number,
+          brand: response.data.brand,
+          model: response.data.model,
+          client_name: response.data.current_client_name,
+          client_cif: response.data.current_client_cif,
+          client_departamento: response.data.current_client_departamento || "",
+          entry_date: new Date().toISOString().split('T')[0]
+        });
+        toast.success('Equipo encontrado en catálogo');
+      } else {
+        // Equipo no encontrado
+        setEquipmentFromCatalog(null);
+        setEquipmentNotFound(true);
+        setFormData({
+          ...formData,
+          serial_number: searchSerial,
+          entry_date: new Date().toISOString().split('T')[0]
+        });
+      }
+    } catch (error) {
+      // Equipo no encontrado
+      setEquipmentFromCatalog(null);
+      setEquipmentNotFound(true);
+      setFormData({
+        ...formData,
+        serial_number: searchSerial,
+        entry_date: new Date().toISOString().split('T')[0]
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleRegisterNewEquipment = () => {
+    setShowFullForm(true);
+    setCatalogDialogOpen(true);
+  };
+
+  const handleResetSearch = () => {
+    setSearchSerial("");
+    setEquipmentFromCatalog(null);
+    setEquipmentNotFound(false);
+    setShowFullForm(false);
+    setFormData({
+      brand: "",
+      model: "",
+      client_name: "",
+      client_cif: "",
+      client_departamento: "",
+      serial_number: "",
+      observations: "",
+      entry_date: new Date().toISOString().split('T')[0]
+    });
   };
 
   const handleSubmit = async (e) => {
