@@ -513,7 +513,8 @@ async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate
         calibration_data=[item.model_dump() for item in calibration.calibration_data],
         spare_parts=[item.model_dump() for item in calibration.spare_parts] if calibration.spare_parts else [],
         calibration_date=calibration.calibration_date,
-        technician=calibration.technician
+        technician=calibration.technician,
+        internal_notes=calibration.internal_notes
     )
     history_dict = history_entry.model_dump()
     await db.calibration_history.insert_one(history_dict)
