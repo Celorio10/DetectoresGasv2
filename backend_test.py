@@ -1159,6 +1159,356 @@ def test_equipment_filtering_bug():
         print("   No se pudo completar la verificación del bug")
         return 1
 
+def test_calibration_history_flow():
+    """
+    TESTING: Verificar flujo completo de calibración y aparición en Historial y Resumen
+    
+    PROBLEMA REPORTADO:
+    - Usuario calibra un equipo en Revisión ✓
+    - Certificado se genera correctamente ✓
+    - Equipo NO aparece en Historial ✗
+    - Equipo NO aparece en Resumen ✗
+    
+    TESTS A REALIZAR:
+    1. Crear y calibrar equipo de prueba con serial "TEST-HISTORY-001"
+    2. Verificar aparición en Historial (/api/calibration-history/search)
+    3. Hacer salida del equipo (delivery)
+    4. Verificar aparición en Resumen (/api/equipment/delivered)
+    5. Diagnóstico de qué falla exactamente
+    """
+    print("🔍 TESTING: Verificar flujo completo de calibración y aparición en Historial y Resumen")
+    print("=" * 90)
+    print("PROBLEMA REPORTADO:")
+    print("- Usuario calibra un equipo en Revisión ✓")
+    print("- Certificado se genera correctamente ✓")
+    print("- Equipo NO aparece en Historial ✗")
+    print("- Equipo NO aparece en Resumen ✗")
+    print("=" * 90)
+    
+    tester = WorkshopAPITester()
+    
+    # Test authentication flow
+    print("\n📋 AUTHENTICATION")
+    print("-" * 20)
+    
+    reg_success, username = tester.test_auth_register()
+    if not reg_success:
+        print("❌ Registration failed, stopping tests")
+        return 1
+    
+    login_success = tester.test_auth_login(username)
+    if not login_success:
+        print("❌ Login failed, stopping tests")
+        return 1
+    
+    # Setup test data
+    print("\n📋 SETUP TEST DATA")
+    print("-" * 20)
+    
+    # Create required master data (ignore if already exists)
+    tester.run_test("Create Brand", "POST", "brands", [200, 400], data={"name": "Honeywell"})
+    tester.run_test("Create Model", "POST", "models", [200, 400], data={"name": "XT-1000"})
+    tester.run_test("Create Technician", "POST", "technicians", [200, 400], data={"name": "Carlos Rodríguez"})
+    
+    client_data = {
+        "name": f"Empresa Test Historial {datetime.now().strftime('%H%M%S')}",
+        "cif": f"C{datetime.now().strftime('%H%M%S')}",
+        "departamento": "Seguridad Industrial"
+    }
+    tester.run_test("Create Client", "POST", "clients", 200, data=client_data)
+    
+    # STEP 1: Crear y calibrar equipo de prueba con serial "TEST-HISTORY-001"
+    print("\n🔧 STEP 1: Crear equipo de prueba con serial 'TEST-HISTORY-001'")
+    serial_number = "TEST-HISTORY-001"
+    equipment_data = {
+        "brand": "Honeywell",
+        "model": "XT-1000",
+        "client_name": client_data["name"],
+        "client_cif": client_data["cif"],
+        "client_departamento": client_data["departamento"],
+        "serial_number": serial_number,
+        "observations": "Equipo para test de historial y resumen",
+        "entry_date": datetime.now().strftime('%Y-%m-%d')
+    }
+    
+    create_success, _ = tester.run_test(
+        "Crear Equipo TEST-HISTORY-001",
+        "POST",
+        "equipment",
+        200,
+        data=equipment_data
+    )
+    
+    if not create_success:
+        print("❌ Failed to create equipment, stopping test")
+        return 1
+    
+    # Calibrar el equipo con 2 sensores y notas internas
+    print("\n🔧 STEP 1b: Calibrar equipo con 2 sensores y notas internas")
+    calibration_data = {
+        "calibration_data": [
+            {
+                "sensor": "CO (Monóxido de Carbono)",
+                "pre_alarm": "25 ppm",
+                "alarm": "50 ppm",
+                "calibration_value": "100 ppm",
+                "valor_zero": "0 ppm",
+                "valor_span": "100 ppm",
+                "calibration_bottle": "BOT-CO-001",
+                "approved": True
+            },
+            {
+                "sensor": "H2S (Sulfuro de Hidrógeno)",
+                "pre_alarm": "5 ppm",
+                "alarm": "10 ppm",
+                "calibration_value": "25 ppm",
+                "valor_zero": "0 ppm",
+                "valor_span": "25 ppm",
+                "calibration_bottle": "BOT-H2S-002",
+                "approved": True
+            }
+        ],
+        "spare_parts": [
+            {
+                "descripcion": "Filtro de entrada",
+                "referencia": "FLT-001",
+                "garantia": True
+            }
+        ],
+        "calibration_date": datetime.now().strftime('%Y-%m-%d'),
+        "technician": "Carlos Rodríguez",
+        "internal_notes": "Calibración realizada sin problemas. Sensores funcionando correctamente."
+    }
+    
+    calibrate_success, calibrate_response = tester.run_test(
+        "Calibrar Equipo TEST-HISTORY-001",
+        "PUT",
+        f"equipment/{serial_number}/calibrate",
+        200,
+        data=calibration_data
+    )
+    
+    if not calibrate_success:
+        print("❌ Failed to calibrate equipment, stopping test")
+        return 1
+    
+    # Verificar que status cambia a "calibrated"
+    print("\n🔍 Verificar que status cambia a 'calibrated'")
+    status_success, status_response = tester.run_test(
+        "Verificar Status Calibrated",
+        "GET",
+        f"equipment/serial/{serial_number}",
+        200
+    )
+    
+    if status_success and status_response:
+        equipment_status = status_response.get('status')
+        if equipment_status == 'calibrated':
+            tester.log_test("Equipment Status Changed to Calibrated", True, f"Status correctly changed to 'calibrated'")
+        else:
+            tester.log_test("Equipment Status Changed to Calibrated", False, f"Status is '{equipment_status}', expected 'calibrated'")
+    
+    # STEP 2: Verificar aparición en Historial
+    print("\n🔧 STEP 2: Verificar aparición en Historial")
+    print("-" * 40)
+    
+    # Buscar en /api/calibration-history/search?serial=TEST-HISTORY-001
+    print("🔍 2a: Buscar en /api/calibration-history/search?serial=TEST-HISTORY-001")
+    history_search_success, history_search_response = tester.run_test(
+        "Buscar en Historial por Serial",
+        "GET",
+        f"calibration-history/search?serial={serial_number}",
+        200
+    )
+    
+    calibration_found_in_history = False
+    has_internal_notes = False
+    
+    if history_search_success and isinstance(history_search_response, list):
+        print(f"   📋 Equipos encontrados en historial: {len(history_search_response)}")
+        
+        for equipment_group in history_search_response:
+            if equipment_group.get('serial_number') == serial_number:
+                calibration_found_in_history = True
+                print(f"   ✅ Equipo {serial_number} encontrado en historial")
+                print(f"   📋 Calibraciones: {len(equipment_group.get('calibrations', []))}")
+                
+                # Verificar que tiene internal_notes
+                calibrations = equipment_group.get('calibrations', [])
+                if calibrations:
+                    # Check if we can find internal_notes in the calibration history
+                    # Note: internal_notes might not be in the search response, need to check individual history
+                    print(f"   📋 Primera calibración: {calibrations[0].get('calibration_date')}")
+                break
+        
+        if calibration_found_in_history:
+            tester.log_test("Equipment Found in Calibration History Search", True, f"Equipment {serial_number} found in history search")
+        else:
+            tester.log_test("Equipment Found in Calibration History Search", False, f"🚨 BUG: Equipment {serial_number} NOT found in history search")
+    else:
+        tester.log_test("Equipment Found in Calibration History Search", False, "Could not retrieve calibration history search results")
+    
+    # Verificar historial completo del equipo específico
+    print("🔍 2b: Verificar historial completo del equipo")
+    equipment_history_success, equipment_history_response = tester.run_test(
+        "Get Equipment History",
+        "GET",
+        f"equipment/{serial_number}/history",
+        200
+    )
+    
+    if equipment_history_success and isinstance(equipment_history_response, list):
+        print(f"   📋 Entradas en historial del equipo: {len(equipment_history_response)}")
+        
+        if len(equipment_history_response) > 0:
+            latest_calibration = equipment_history_response[0]
+            has_internal_notes = bool(latest_calibration.get('internal_notes'))
+            
+            if has_internal_notes:
+                tester.log_test("Equipment History Has Internal Notes", True, f"Internal notes found: '{latest_calibration.get('internal_notes')}'")
+            else:
+                tester.log_test("Equipment History Has Internal Notes", False, "Internal notes missing in calibration history")
+            
+            tester.log_test("Equipment Individual History Found", True, f"Equipment history contains {len(equipment_history_response)} calibrations")
+        else:
+            tester.log_test("Equipment Individual History Found", False, f"🚨 BUG: No calibration history found for equipment {serial_number}")
+    else:
+        tester.log_test("Equipment Individual History Found", False, "Could not retrieve equipment individual history")
+    
+    # STEP 3: Hacer salida del equipo (delivery)
+    print("\n🔧 STEP 3: Registrar salida del equipo")
+    print("-" * 35)
+    
+    delivery_data = {
+        "serial_numbers": [serial_number],
+        "delivery_note": f"DN-HISTORY-TEST-{datetime.now().strftime('%H%M%S')}",
+        "delivery_location": "Planta Industrial Cliente",
+        "delivery_date": datetime.now().strftime('%Y-%m-%d')
+    }
+    
+    delivery_success, _ = tester.run_test(
+        "Registrar Salida del Equipo",
+        "PUT",
+        "equipment/deliver",
+        200,
+        data=delivery_data
+    )
+    
+    if not delivery_success:
+        print("❌ Failed to deliver equipment, stopping test")
+        return 1
+    
+    # Verificar que status cambia a "delivered"
+    print("🔍 Verificar que status cambia a 'delivered'")
+    delivered_status_success, delivered_status_response = tester.run_test(
+        "Verificar Status Delivered",
+        "GET",
+        f"equipment/serial/{serial_number}",
+        [200, 404]  # 404 is acceptable since delivered equipment might not be in active equipment endpoint
+    )
+    
+    # STEP 4: Verificar aparición en Resumen
+    print("\n🔧 STEP 4: Verificar aparición en Resumen")
+    print("-" * 35)
+    
+    # GET /api/equipment/delivered
+    print("🔍 4a: Verificar en GET /api/equipment/delivered")
+    delivered_list_success, delivered_list_response = tester.run_test(
+        "Get Delivered Equipment List",
+        "GET",
+        "equipment/delivered",
+        200
+    )
+    
+    equipment_found_in_delivered = False
+    
+    if delivered_list_success and isinstance(delivered_list_response, list):
+        print(f"   📋 Equipos entregados: {len(delivered_list_response)}")
+        
+        for equipment in delivered_list_response:
+            if equipment.get('serial_number') == serial_number:
+                equipment_found_in_delivered = True
+                equipment_status = equipment.get('status')
+                print(f"   ✅ Equipo {serial_number} encontrado en lista de entregados")
+                print(f"   📋 Status: {equipment_status}")
+                print(f"   📋 Delivery note: {equipment.get('delivery_note')}")
+                print(f"   📋 Delivery date: {equipment.get('delivery_date')}")
+                break
+        
+        if equipment_found_in_delivered:
+            tester.log_test("Equipment Found in Delivered List", True, f"Equipment {serial_number} found in delivered equipment list with status 'delivered'")
+        else:
+            tester.log_test("Equipment Found in Delivered List", False, f"🚨 BUG: Equipment {serial_number} NOT found in delivered equipment list")
+    else:
+        tester.log_test("Equipment Found in Delivered List", False, "Could not retrieve delivered equipment list")
+    
+    # STEP 5: Diagnóstico detallado
+    print("\n🔧 STEP 5: Diagnóstico detallado")
+    print("-" * 30)
+    
+    print("\n📊 ANÁLISIS DE RESULTADOS:")
+    print("=" * 50)
+    
+    # Análisis del problema en Historial
+    if not calibration_found_in_history:
+        print("🚨 PROBLEMA EN HISTORIAL:")
+        print("   - La calibración NO se guarda en calibration_history")
+        print("   - O el endpoint de búsqueda /api/calibration-history/search no funciona")
+        print("   - Verificar que el endpoint PUT /equipment/{serial}/calibrate guarde en calibration_history")
+    else:
+        print("✅ HISTORIAL FUNCIONA:")
+        print("   - La calibración se guarda correctamente en calibration_history")
+        print("   - El endpoint de búsqueda funciona correctamente")
+    
+    # Análisis del problema en Resumen
+    if not equipment_found_in_delivered:
+        print("\n🚨 PROBLEMA EN RESUMEN:")
+        print("   - El equipo NO aparece en la lista de equipos entregados")
+        print("   - O el status no cambia correctamente a 'delivered'")
+        print("   - Verificar que el endpoint PUT /equipment/deliver actualice el status")
+    else:
+        print("\n✅ RESUMEN FUNCIONA:")
+        print("   - El equipo aparece correctamente en la lista de equipos entregados")
+        print("   - El status se actualiza correctamente a 'delivered'")
+    
+    # Print final results
+    print("\n" + "=" * 90)
+    print(f"📊 CALIBRATION HISTORY FLOW RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("=" * 90)
+    
+    # Print detailed results for failed tests
+    failed_tests = [test for test in tester.test_results if not test['success']]
+    if failed_tests:
+        print("\n❌ FAILED TESTS:")
+        for test in failed_tests:
+            print(f"   • {test['test']}: {test['details']}")
+    
+    # Specific diagnosis
+    history_bug = not calibration_found_in_history
+    summary_bug = not equipment_found_in_delivered
+    
+    if history_bug or summary_bug:
+        print("\n🔧 RECOMENDACIONES PARA MAIN AGENT:")
+        if history_bug:
+            print("   1. Verificar que PUT /equipment/{serial}/calibrate guarde en calibration_history")
+            print("   2. Verificar que el modelo CalibrationHistory se esté usando correctamente")
+            print("   3. Verificar que el endpoint /api/calibration-history/search funcione")
+        
+        if summary_bug:
+            print("   4. Verificar que PUT /equipment/deliver actualice el status a 'delivered'")
+            print("   5. Verificar que GET /api/equipment/delivered filtre por status 'delivered'")
+        
+        return 1
+    elif tester.tests_passed == tester.tests_run:
+        print("\n✅ FLUJO COMPLETO FUNCIONA CORRECTAMENTE:")
+        print("   - Calibración se guarda en historial ✓")
+        print("   - Equipo aparece en resumen después de entrega ✓")
+        print("   - No se detectaron bugs en el backend")
+        return 0
+    else:
+        print(f"\n⚠️ TESTS INCOMPLETOS: {tester.tests_run - tester.tests_passed} tests failed")
+        return 1
+
 if __name__ == "__main__":
     # Check if we should run specific tests
     if len(sys.argv) > 1:
@@ -1168,5 +1518,7 @@ if __name__ == "__main__":
             sys.exit(test_logo_fix_critical())
         elif sys.argv[1] == "filter_bug":
             sys.exit(test_equipment_filtering_bug())
+        elif sys.argv[1] == "history_flow":
+            sys.exit(test_calibration_history_flow())
     else:
         sys.exit(main())
