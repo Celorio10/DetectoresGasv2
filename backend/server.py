@@ -462,6 +462,63 @@ async def get_all_calibration_history(current_user: dict = Depends(get_current_u
     ).sort("calibration_date", -1).to_list(10000)
     return history
 
+@api_router.get("/calibration-history/search")
+async def search_calibration_history(
+    cliente: str = None,
+    modelo: str = None,
+    serial: str = None,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Buscar historial de calibraciones con filtros opcionales.
+    Agrupa calibraciones por serial_number y retorna información del equipo con todas sus calibraciones.
+    """
+    # Construir query de búsqueda
+    query = {}
+    if cliente:
+        query["client_name"] = {"$regex": cliente, "$options": "i"}
+    if modelo:
+        query["model"] = {"$regex": modelo, "$options": "i"}
+    if serial:
+        query["serial_number"] = {"$regex": serial, "$options": "i"}
+    
+    # Obtener todas las calibraciones que coincidan
+    all_calibrations = await db.calibration_history.find(
+        query,
+        {"_id": 0}
+    ).sort("calibration_date", -1).to_list(10000)
+    
+    # Agrupar por serial_number
+    equipments = {}
+    for cal in all_calibrations:
+        serial_num = cal.get('serial_number')
+        if serial_num not in equipments:
+            equipments[serial_num] = {
+                "serial_number": serial_num,
+                "brand": cal.get('brand'),
+                "model": cal.get('model'),
+                "client_name": cal.get('client_name'),
+                "client_departamento": cal.get('client_departamento', ''),
+                "last_calibration_date": cal.get('calibration_date'),
+                "calibrations": []
+            }
+        
+        equipments[serial_num]["calibrations"].append({
+            "id": cal.get('id'),
+            "calibration_date": cal.get('calibration_date'),
+            "technician": cal.get('technician'),
+            "calibration_data": cal.get('calibration_data', []),
+            "spare_parts": cal.get('spare_parts', []),
+            "observations": cal.get('observations', ''),
+            "certificate_number": cal.get('certificate_number', '')
+        })
+    
+    # Convertir a lista y ordenar por última fecha de calibración
+    result = list(equipments.values())
+    result.sort(key=lambda x: x['last_calibration_date'], reverse=True)
+    
+    return result
+
 @api_router.get("/equipment/{serial_number}/history", response_model=List[CalibrationHistory])
 async def get_equipment_history(serial_number: str, current_user: dict = Depends(get_current_user)):
     """Obtener historial de calibraciones de un equipo"""
