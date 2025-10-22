@@ -373,9 +373,13 @@ async def get_equipment_by_serial(serial_number: str, current_user: dict = Depen
 
 @api_router.put("/equipment/{serial_number}/calibrate", response_model=Equipment)
 async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate, current_user: dict = Depends(get_current_user)):
-    equipment = await db.equipment.find_one({"serial_number": serial_number})
+    # Buscar el equipo que NO está delivered (el que está actualmente en el taller)
+    equipment = await db.equipment.find_one({
+        "serial_number": serial_number,
+        "status": {"$ne": "delivered"}
+    })
     if not equipment:
-        raise HTTPException(status_code=404, detail="Equipment not found")
+        raise HTTPException(status_code=404, detail="Equipment not found or already delivered")
     
     update_data = {
         "status": "calibrated",
@@ -385,8 +389,9 @@ async def calibrate_equipment(serial_number: str, calibration: CalibrationUpdate
         "technician": calibration.technician
     }
     
-    await db.equipment.update_one({"serial_number": serial_number}, {"$set": update_data})
-    updated = await db.equipment.find_one({"serial_number": serial_number}, {"_id": 0})
+    # Actualizar usando el ID específico del equipo, no solo el serial_number
+    await db.equipment.update_one({"id": equipment['id']}, {"$set": update_data})
+    updated = await db.equipment.find_one({"id": equipment['id']}, {"_id": 0})
     
     # Guardar en historial de calibraciones
     history_entry = CalibrationHistory(
