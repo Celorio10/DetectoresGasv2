@@ -278,6 +278,21 @@ pdf:
         agent: "testing"
         comment: "✅ TESTED: Logo ASCONSA existe en /app/backend/static/logo_asconsa.png y se integra correctamente en el PDF generado. Logo aparece en la parte superior izquierda del certificado con dimensiones 6cm x 3cm como especificado."
 
+  - task: "Ajustar tamaño del logo ASCONSA en PDF a dimensiones óptimas"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/pdf_generator.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Error reportado: Logo demasiado grande (510 x 1778 points) causando overflow en PDF. Error al registrar salida de equipo con generación de certificado."
+      - working: "NA"
+        agent: "main"
+        comment: "Logo ajustado a dimensiones específicas del usuario: 7.15cm x 1.93cm (71.5mm x 19.3mm). Línea 44 de pdf_generator.py modificada para especificar width y height explícitamente."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
