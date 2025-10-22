@@ -253,7 +253,8 @@ export default function EquipmentReview() {
           calibration_data: calibrationData,
           spare_parts: spareParts,
           calibration_date: calibrationDate,
-          technician: selectedTechnician
+          technician: selectedTechnician,
+          internal_notes: internalNotes
         },
         getAuthHeaders()
       );
