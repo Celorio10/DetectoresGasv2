@@ -258,9 +258,15 @@ frontend:
       - working: false
         agent: "user"
         comment: "Problema persiste con equipo '1111': También aparece en Revisión Y Salidas después de calibrar. Validación debería prevenir esto pero no funciona."
-      - working: true
+      - working: "NA"
         agent: "main"
         comment: "Eliminados TODOS los duplicados (00000 y 1111). Mejorada validación en backend para ser más explícita: ahora verifica status 'pending' Y 'calibrated' específicamente. Mensaje de error más descriptivo. No se encontraron más duplicados en el sistema."
+      - working: false
+        agent: "user"
+        comment: "Problema PERSISTE: Después de calibrar equipo, sigue apareciendo en Revisión. Usuario confirma flujo: Ingreso → Calibración → Verificación (NO desaparece de Revisión)."
+      - working: true
+        agent: "main"
+        comment: "CAUSA RAÍZ REAL ENCONTRADA: Cuando hay múltiples equipos con mismo serial (1 delivered + 1 pending), los endpoints de calibración y entrega usaban update_one con solo serial_number, actualizando el equipo INCORRECTO. Fix: Ahora buscan equipo específico por ID y filtran por status correcto. Líneas modificadas: 374-391 (calibrate) y 503-523 (deliver)."
 
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
