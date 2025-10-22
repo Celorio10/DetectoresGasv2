@@ -280,6 +280,18 @@ frontend:
         agent: "main"
         comment: "Nueva funcionalidad implementada: Buscador con 3 filtros (Cliente, Modelo, Nº Serie), equipos agrupados por serial mostrando todas sus calibraciones históricas. Backend: nuevo endpoint /calibration-history/search que agrupa por serial_number. Frontend: interfaz renovada con expansión mostrando historial completo de calibraciones para cada equipo."
 
+  - task: "Crear sistema de catálogo maestro de equipos"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/pages/EquipmentMasterCatalog.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Sistema de catálogo maestro implementado. Backend: modelo EquipmentMaster con sensores predeterminados (sensor, pre-alarma, alarma, valor calibración), endpoints CRUD completos. Frontend: nueva pestaña Catálogo con buscador, formulario completo, gestión de sensores predeterminados. Usa sistema de clientes existente con selector y modal para añadir nuevos clientes con departamentos."
+
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
