@@ -304,6 +304,18 @@ frontend:
         agent: "main"
         comment: "Entrada de Taller rediseñada con búsqueda de equipo en catálogo maestro. Flujo A (equipo encontrado): solo fecha y observaciones editables, datos del catálogo mostrados en solo lectura con opción de editar en catálogo. Flujo B (equipo no encontrado): modal de advertencia con opción de registrar nuevo equipo completo. Al registrar entrada, si equipo es nuevo también se guarda en catálogo maestro automáticamente."
 
+  - task: "Agregar campo de notas internas del técnico en calibración"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/pages/EquipmentReview.js, /app/frontend/src/pages/EquipmentHistory.js"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Campo 'internal_notes' agregado a modelos CalibrationUpdate y CalibrationHistory. Frontend: campo de texto en EquipmentReview debajo de repuestos con advertencia de que no aparece en certificado. EquipmentHistory: muestra notas internas en panel amarillo cuando se expande calibración. PDF generator NO modificado (las notas no deben aparecer en certificado)."
+
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
