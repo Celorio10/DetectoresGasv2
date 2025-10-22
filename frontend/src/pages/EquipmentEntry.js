@@ -222,22 +222,45 @@ export default function EquipmentEntry() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (!formData.serial_number || !formData.brand || !formData.model) {
+      toast.error('Completa los campos obligatorios');
+      return;
+    }
+
     setLoading(true);
     try {
+      // Si el equipo NO está en el catálogo maestro, primero lo registramos allí
+      if (equipmentNotFound || showFullForm) {
+        try {
+          await axios.post(`${API}/equipment-master`, {
+            serial_number: formData.serial_number,
+            brand: formData.brand,
+            model: formData.model,
+            current_client_name: formData.client_name,
+            current_client_cif: formData.client_cif,
+            current_client_departamento: formData.client_departamento,
+            default_sensors: [],
+            general_observations: ""
+          }, getAuthHeaders());
+          toast.success('Equipo registrado en catálogo maestro');
+        } catch (error) {
+          // Si ya existe, continuamos (puede haber sido creado entre la búsqueda y el submit)
+          if (!error.response?.data?.detail?.includes('already exists')) {
+            throw error;
+          }
+        }
+      }
+
+      // Registrar entrada al taller
       await axios.post(`${API}/equipment`, formData, getAuthHeaders());
-      toast.success('Equipo registrado correctamente');
-      setFormData({
-        brand: "",
-        model: "",
-        client_name: "",
-        client_cif: "",
-        client_departamento: "",
-        serial_number: "",
-        observations: "",
-        entry_date: new Date().toISOString().split('T')[0]
-      });
+      toast.success('Entrada al taller registrada correctamente');
+      
+      // Reset
+      handleResetSearch();
+      
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al registrar equipo');
+      toast.error(error.response?.data?.detail || 'Error al registrar entrada');
     } finally {
       setLoading(false);
     }
