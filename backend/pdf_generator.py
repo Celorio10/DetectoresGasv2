@@ -165,11 +165,13 @@ def generate_certificate_pdf(equipment_data, output_path):
             ]
             spare_rows.append(row)
         
-        spare_table = Table(spare_rows, colWidths=[90*mm, 60*mm, 30*mm])
+        # Mismo ancho total que tabla de calibración (167mm)
+        spare_table = Table(spare_rows, colWidths=[97*mm, 50*mm, 20*mm])
         spare_table.setStyle(TableStyle([
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
             ('BACKGROUND', (0, 0), (-1, 0), colors.lightgrey),
             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
+            ('ALIGN', (2, 0), (2, -1), 'CENTER'),  # Centrar columna garantía
             ('LEFTPADDING', (0, 0), (-1, -1), 3),
             ('RIGHTPADDING', (0, 0), (-1, -1), 3),
             ('TOPPADDING', (0, 0), (-1, -1), 3),
