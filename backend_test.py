@@ -48,7 +48,11 @@ class WorkshopAPITester:
             elif method == 'PUT':
                 response = requests.put(url, json=data, headers=test_headers, timeout=10)
 
-            success = response.status_code == expected_status
+            # Handle both single status code and list of acceptable status codes
+            if isinstance(expected_status, list):
+                success = response.status_code in expected_status
+            else:
+                success = response.status_code == expected_status
             
             if success:
                 self.log_test(name, True)
