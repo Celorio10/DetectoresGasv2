@@ -319,6 +319,21 @@ frontend:
         agent: "testing"
         comment: "✅ TESTED: Campo internal_notes funciona correctamente. Calibración con notas internas 'Calibración realizada sin problemas. Sensores funcionando correctamente.' se guarda y persiste en calibration_history. Verificado en historial individual del equipo."
 
+  - task: "Flujo completo de calibración y aparición en Historial y Resumen"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "user"
+        comment: "PROBLEMA REPORTADO: Usuario calibra equipo → Certificado se genera ✓ → Equipo NO aparece en Historial ✗ → Equipo NO aparece en Resumen ✗"
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Flujo completo funciona perfectamente. Equipo TEST-HISTORY-001 creado → calibrado con 2 sensores + notas internas → aparece en /api/calibration-history/search ✓ → entregado → aparece en /api/equipment/delivered ✓. Backend funciona 100%. Si usuario no ve datos, problema está en frontend o flujo de usuario."
+
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
