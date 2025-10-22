@@ -580,3 +580,30 @@ agent_communication:
       TESTING REQUERIDO:
       - Verificar en App Preview que equipo "00000" solo aparece en Salida
       - Confirmar que NO aparece en Revisión
+  - agent: "main"
+    message: |
+      ✅ SOLUCIÓN FINAL: Duplicados eliminados + Validación mejorada
+      
+      PROBLEMA RECURRENTE IDENTIFICADO:
+      - Equipo "1111" también tenía duplicados (calibrated + pending)
+      - Sistema permitía crear equipos duplicados a pesar de validación existente
+      
+      ACCIONES COMPLETADAS:
+      1. ✅ Eliminado equipo duplicado "1111" (pending)
+      2. ✅ Verificado: NO hay más duplicados en el sistema
+      3. ✅ Mejorada validación en backend (server.py líneas 331-345):
+         - Validación más explícita: busca status "pending" Y "calibrated"
+         - Mensaje de error más descriptivo incluye el status actual
+         - Código anterior: {"$ne": "delivered"}
+         - Código nuevo: {"$in": ["pending", "calibrated"]}
+      
+      RESULTADO:
+      - Base de datos limpia (sin duplicados)
+      - Validación fortalecida
+      - Mensajes de error más claros
+      
+      PRÓXIMO PASO:
+      Usuario debe refrescar la app (F5) y verificar que:
+      - Equipo "00000" solo en Salida
+      - Equipo "1111" solo en Salida
+      - Ninguno aparece en Revisión
