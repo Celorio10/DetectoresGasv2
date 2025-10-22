@@ -618,6 +618,7 @@ async def search_calibration_history(
             "calibration_data": cal.get('calibration_data', []),
             "spare_parts": cal.get('spare_parts', []),
             "observations": cal.get('observations', ''),
+            "internal_notes": cal.get('internal_notes', ''),
             "certificate_number": cal.get('certificate_number', '')
         })
     
