@@ -119,11 +119,57 @@ export default function EquipmentHistory() {
           </h1>
         </div>
 
+        {/* Buscador */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100 mb-6">
+          <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
+            🔍 Buscador de Equipos
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            <div>
+              <Label>Cliente</Label>
+              <Input
+                placeholder="Buscar por cliente..."
+                value={filters.cliente}
+                onChange={(e) => setFilters({...filters, cliente: e.target.value})}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+            <div>
+              <Label>Modelo</Label>
+              <Input
+                placeholder="Buscar por modelo..."
+                value={filters.modelo}
+                onChange={(e) => setFilters({...filters, modelo: e.target.value})}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+            <div>
+              <Label>Nº de Serie</Label>
+              <Input
+                placeholder="Buscar por número de serie..."
+                value={filters.serial}
+                onChange={(e) => setFilters({...filters, serial: e.target.value})}
+                onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={handleSearch} className="bg-purple-600 hover:bg-purple-700">
+              <Search className="w-4 h-4 mr-2" />
+              Buscar
+            </Button>
+            <Button onClick={handleClearFilters} variant="outline">
+              <X className="w-4 h-4 mr-2" />
+              Limpiar
+            </Button>
+          </div>
+        </div>
+
         {loading ? (
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100 text-center">
-            <p className="text-gray-600">Cargando historial...</p>
+            <p className="text-gray-600">Buscando equipos...</p>
           </div>
-        ) : history.length > 0 ? (
+        ) : equipments.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
               Todos los Equipos Revisados
