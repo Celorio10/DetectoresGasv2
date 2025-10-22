@@ -292,6 +292,18 @@ frontend:
         agent: "main"
         comment: "Sistema de catálogo maestro implementado. Backend: modelo EquipmentMaster con sensores predeterminados (sensor, pre-alarma, alarma, valor calibración), endpoints CRUD completos. Frontend: nueva pestaña Catálogo con buscador, formulario completo, gestión de sensores predeterminados. Usa sistema de clientes existente con selector y modal para añadir nuevos clientes con departamentos."
 
+  - task: "Simplificar Entrada de Taller con integración a catálogo maestro"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentEntry.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Entrada de Taller rediseñada con búsqueda de equipo en catálogo maestro. Flujo A (equipo encontrado): solo fecha y observaciones editables, datos del catálogo mostrados en solo lectura con opción de editar en catálogo. Flujo B (equipo no encontrado): modal de advertencia con opción de registrar nuevo equipo completo. Al registrar entrada, si equipo es nuevo también se guarda en catálogo maestro automáticamente."
+
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
