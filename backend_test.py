@@ -877,8 +877,11 @@ def main():
         return 1
 
 if __name__ == "__main__":
-    # Check if we should run FASE 2 tests
-    if len(sys.argv) > 1 and sys.argv[1] == "fase2":
-        sys.exit(test_fase2_pdf_generation())
+    # Check if we should run specific tests
+    if len(sys.argv) > 1:
+        if sys.argv[1] == "fase2":
+            sys.exit(test_fase2_pdf_generation())
+        elif sys.argv[1] == "logo_fix":
+            sys.exit(test_logo_fix_critical())
     else:
         sys.exit(main())
