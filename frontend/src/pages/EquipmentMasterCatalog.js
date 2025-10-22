@@ -75,6 +75,66 @@ export default function EquipmentMasterCatalog() {
     }
   };
 
+  const loadClients = async () => {
+    try {
+      const response = await axios.get(`${API}/clients`, getAuthHeaders());
+      setClients(response.data);
+    } catch (error) {
+      toast.error('Error al cargar clientes');
+    }
+  };
+
+  const handleClientSelect = (clientId) => {
+    const client = clients.find(c => c.id === clientId);
+    if (client) {
+      setSelectedClientDepartamentos(client.departamentos || []);
+      setFormData({
+        ...formData,
+        current_client_name: client.name,
+        current_client_cif: client.cif,
+        current_client_departamento: ""
+      });
+    }
+  };
+
+  const handleAddClient = async () => {
+    if (!newClient.name.trim() || !newClient.cif.trim()) {
+      toast.error('Completa nombre y CIF del cliente');
+      return;
+    }
+    
+    setClientDialogOpen(false);
+    
+    setTimeout(async () => {
+      try {
+        await axios.post(`${API}/clients`, newClient, getAuthHeaders());
+        toast.success('Cliente añadido');
+        setNewClient({ name: "", cif: "", departamentos: [] });
+        setNewDepartamento("");
+        loadClients();
+      } catch (error) {
+        toast.error(error.response?.data?.detail || 'Error al añadir cliente');
+      }
+    }, 300);
+  };
+
+  const handleAddDepartamento = () => {
+    if (newDepartamento.trim() && !newClient.departamentos.includes(newDepartamento)) {
+      setNewClient({
+        ...newClient,
+        departamentos: [...newClient.departamentos, newDepartamento]
+      });
+      setNewDepartamento("");
+    }
+  };
+
+  const handleRemoveDepartamento = (dept) => {
+    setNewClient({
+      ...newClient,
+      departamentos: newClient.departamentos.filter(d => d !== dept)
+    });
+  };
+
   const handleSearch = async () => {
     setLoading(true);
     try {
