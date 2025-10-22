@@ -268,6 +268,18 @@ frontend:
         agent: "main"
         comment: "CAUSA RAÍZ REAL ENCONTRADA: Cuando hay múltiples equipos con mismo serial (1 delivered + 1 pending), los endpoints de calibración y entrega usaban update_one con solo serial_number, actualizando el equipo INCORRECTO. Fix: Ahora buscan equipo específico por ID y filtran por status correcto. Líneas modificadas: 374-391 (calibrate) y 503-523 (deliver)."
 
+  - task: "Mejorar pestaña Historial con buscador y agrupación por equipo"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentHistory.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Nueva funcionalidad implementada: Buscador con 3 filtros (Cliente, Modelo, Nº Serie), equipos agrupados por serial mostrando todas sus calibraciones históricas. Backend: nuevo endpoint /calibration-history/search que agrupa por serial_number. Frontend: interfaz renovada con expansión mostrando historial completo de calibraciones para cada equipo."
+
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
