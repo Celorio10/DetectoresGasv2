@@ -321,7 +321,8 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Eliminar equipo calibrado de lista de equipos pendientes en pestaña Revisión"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
