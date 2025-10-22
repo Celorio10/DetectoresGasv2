@@ -876,6 +876,285 @@ def main():
         print(f"⚠️  {tester.tests_run - tester.tests_passed} tests failed")
         return 1
 
+def test_equipment_filtering_bug():
+    """
+    DEBUGGING: Verificar filtrado de equipos pendientes después de calibración
+    
+    PROBLEMA REPORTADO:
+    - Después de calibrar un equipo, este aparece en la pestaña "Salida" ✅
+    - PERO el equipo sigue apareciendo en la pestaña "Revisión" ❌
+    - Debería desaparecer de "Revisión" después de calibrarse
+    
+    TESTS A REALIZAR:
+    1. Crear un equipo nuevo con status "pending"
+    2. Verificar que aparece en GET /api/equipment/pending
+    3. Calibrar el equipo (PUT /api/equipment/{serial}/calibrate)
+    4. Verificar inmediatamente después que:
+       - El equipo tiene status "calibrated" en la base de datos
+       - El equipo NO aparece en GET /api/equipment/pending
+       - El equipo SÍ aparece en GET /api/equipment/calibrated
+    """
+    print("🔍 DEBUGGING: Verificar filtrado de equipos pendientes después de calibración")
+    print("=" * 80)
+    print("PROBLEMA REPORTADO:")
+    print("- Después de calibrar un equipo, este aparece en la pestaña 'Salida' ✅")
+    print("- PERO el equipo sigue apareciendo en la pestaña 'Revisión' ❌")
+    print("- Debería desaparecer de 'Revisión' después de calibrarse")
+    print("=" * 80)
+    
+    tester = WorkshopAPITester()
+    
+    # Test authentication flow
+    print("\n📋 AUTHENTICATION")
+    print("-" * 20)
+    
+    reg_success, username = tester.test_auth_register()
+    if not reg_success:
+        print("❌ Registration failed, stopping tests")
+        return 1
+    
+    login_success = tester.test_auth_login(username)
+    if not login_success:
+        print("❌ Login failed, stopping tests")
+        return 1
+    
+    # Setup test data
+    print("\n📋 SETUP TEST DATA")
+    print("-" * 20)
+    
+    # Create required master data
+    tester.run_test("Create Brand", "POST", "brands", 200, data={"name": "Honeywell"})
+    tester.run_test("Create Model", "POST", "models", 200, data={"name": "XT-1000"})
+    tester.run_test("Create Technician", "POST", "technicians", 200, data={"name": "Juan Pérez"})
+    
+    client_data = {
+        "name": "Empresa Test Filtrado",
+        "cif": "B99887766",
+        "departamento": "Mantenimiento"
+    }
+    tester.run_test("Create Client", "POST", "clients", 200, data=client_data)
+    
+    # STEP 1: Crear un equipo nuevo con status "pending"
+    print("\n🔧 STEP 1: Crear equipo nuevo con status 'pending'")
+    serial_number = f"SN-FILTER-TEST-{datetime.now().strftime('%H%M%S')}"
+    equipment_data = {
+        "brand": "Honeywell",
+        "model": "XT-1000",
+        "client_name": client_data["name"],
+        "client_cif": client_data["cif"],
+        "client_departamento": client_data["departamento"],
+        "serial_number": serial_number,
+        "observations": "Equipo para test de filtrado después de calibración",
+        "entry_date": datetime.now().strftime('%Y-%m-%d')
+    }
+    
+    create_success, _ = tester.run_test(
+        "Crear Equipo con Status Pending",
+        "POST",
+        "equipment",
+        200,
+        data=equipment_data
+    )
+    
+    if not create_success:
+        print("❌ Failed to create equipment, stopping test")
+        return 1
+    
+    # STEP 2: Verificar que aparece en GET /api/equipment/pending
+    print("\n🔧 STEP 2: Verificar que aparece en GET /api/equipment/pending")
+    pending_success, pending_response = tester.run_test(
+        "Get Pending Equipment (Before Calibration)",
+        "GET",
+        "equipment/pending",
+        200
+    )
+    
+    if pending_success:
+        # Check if our equipment is in the pending list
+        equipment_found_in_pending = False
+        if isinstance(pending_response, list):
+            for equipment in pending_response:
+                if equipment.get('serial_number') == serial_number:
+                    equipment_found_in_pending = True
+                    break
+        
+        if equipment_found_in_pending:
+            tester.log_test("Equipment Found in Pending List", True, f"Equipment {serial_number} correctly appears in pending list")
+        else:
+            tester.log_test("Equipment Found in Pending List", False, f"Equipment {serial_number} NOT found in pending list")
+            print("❌ Equipment not found in pending list, stopping test")
+            return 1
+    else:
+        print("❌ Failed to get pending equipment, stopping test")
+        return 1
+    
+    # STEP 3: Calibrar el equipo (PUT /api/equipment/{serial}/calibrate)
+    print("\n🔧 STEP 3: Calibrar el equipo")
+    calibration_data = {
+        "calibration_data": [
+            {
+                "sensor": "CO (Monóxido de Carbono)",
+                "pre_alarm": "25 ppm",
+                "alarm": "50 ppm",
+                "calibration_value": "100 ppm",
+                "valor_zero": "0 ppm",
+                "valor_span": "100 ppm",
+                "calibration_bottle": "BOT-CO-001",
+                "approved": True
+            }
+        ],
+        "spare_parts": [
+            {
+                "descripcion": "Filtro de entrada",
+                "referencia": "FLT-001",
+                "garantia": True
+            }
+        ],
+        "calibration_date": datetime.now().strftime('%Y-%m-%d'),
+        "technician": "Juan Pérez"
+    }
+    
+    calibrate_success, calibrate_response = tester.run_test(
+        "Calibrar Equipo",
+        "PUT",
+        f"equipment/{serial_number}/calibrate",
+        200,
+        data=calibration_data
+    )
+    
+    if not calibrate_success:
+        print("❌ Failed to calibrate equipment, stopping test")
+        return 1
+    
+    # STEP 4: Verificaciones inmediatas después de calibración
+    print("\n🔧 STEP 4: Verificaciones después de calibración")
+    print("-" * 50)
+    
+    # 4a: Verificar que el equipo tiene status "calibrated" en la base de datos
+    print("🔍 4a: Verificar status 'calibrated' en base de datos")
+    status_success, status_response = tester.run_test(
+        "Get Equipment Status After Calibration",
+        "GET",
+        f"equipment/serial/{serial_number}",
+        200
+    )
+    
+    if status_success and status_response:
+        equipment_status = status_response.get('status')
+        if equipment_status == 'calibrated':
+            tester.log_test("Equipment Status is Calibrated", True, f"Status correctly changed to 'calibrated'")
+        else:
+            tester.log_test("Equipment Status is Calibrated", False, f"Status is '{equipment_status}', expected 'calibrated'")
+    else:
+        tester.log_test("Equipment Status is Calibrated", False, "Could not retrieve equipment status")
+    
+    # 4b: Verificar que el equipo NO aparece en GET /api/equipment/pending
+    print("🔍 4b: Verificar que NO aparece en GET /api/equipment/pending")
+    pending_after_success, pending_after_response = tester.run_test(
+        "Get Pending Equipment (After Calibration)",
+        "GET",
+        "equipment/pending",
+        200
+    )
+    
+    if pending_after_success:
+        # Check if our equipment is still in the pending list (it should NOT be)
+        equipment_still_in_pending = False
+        if isinstance(pending_after_response, list):
+            for equipment in pending_after_response:
+                if equipment.get('serial_number') == serial_number:
+                    equipment_still_in_pending = True
+                    break
+        
+        if not equipment_still_in_pending:
+            tester.log_test("Equipment NOT in Pending List After Calibration", True, f"Equipment {serial_number} correctly removed from pending list")
+        else:
+            tester.log_test("Equipment NOT in Pending List After Calibration", False, f"🚨 BUG CONFIRMED: Equipment {serial_number} still appears in pending list after calibration!")
+    else:
+        tester.log_test("Equipment NOT in Pending List After Calibration", False, "Could not retrieve pending equipment list")
+    
+    # 4c: Verificar que el equipo SÍ aparece en GET /api/equipment/calibrated
+    print("🔍 4c: Verificar que SÍ aparece en GET /api/equipment/calibrated")
+    calibrated_success, calibrated_response = tester.run_test(
+        "Get Calibrated Equipment",
+        "GET",
+        "equipment/calibrated",
+        200
+    )
+    
+    if calibrated_success:
+        # Check if our equipment is in the calibrated list
+        equipment_found_in_calibrated = False
+        if isinstance(calibrated_response, list):
+            for equipment in calibrated_response:
+                if equipment.get('serial_number') == serial_number:
+                    equipment_found_in_calibrated = True
+                    break
+        
+        if equipment_found_in_calibrated:
+            tester.log_test("Equipment Found in Calibrated List", True, f"Equipment {serial_number} correctly appears in calibrated list")
+        else:
+            tester.log_test("Equipment Found in Calibrated List", False, f"Equipment {serial_number} NOT found in calibrated list")
+    else:
+        tester.log_test("Equipment Found in Calibrated List", False, "Could not retrieve calibrated equipment list")
+    
+    # Print detailed analysis
+    print("\n" + "=" * 80)
+    print("📊 ANÁLISIS DETALLADO DEL FILTRADO")
+    print("=" * 80)
+    
+    # Count equipment in each list for debugging
+    if pending_after_success and isinstance(pending_after_response, list):
+        print(f"📋 Equipos en lista PENDING después de calibración: {len(pending_after_response)}")
+        for eq in pending_after_response:
+            status_indicator = "🚨" if eq.get('serial_number') == serial_number else "✅"
+            print(f"   {status_indicator} {eq.get('serial_number', 'N/A')} - Status: {eq.get('status', 'N/A')}")
+    
+    if calibrated_success and isinstance(calibrated_response, list):
+        print(f"📋 Equipos en lista CALIBRATED: {len(calibrated_response)}")
+        for eq in calibrated_response:
+            status_indicator = "✅" if eq.get('serial_number') == serial_number else "ℹ️"
+            print(f"   {status_indicator} {eq.get('serial_number', 'N/A')} - Status: {eq.get('status', 'N/A')}")
+    
+    # Print final results
+    print("\n" + "=" * 80)
+    print(f"📊 FILTRADO TEST RESULTS: {tester.tests_passed}/{tester.tests_run} tests passed")
+    print("=" * 80)
+    
+    # Print detailed results for failed tests
+    failed_tests = [test for test in tester.test_results if not test['success']]
+    if failed_tests:
+        print("\n❌ FAILED TESTS:")
+        for test in failed_tests:
+            print(f"   • {test['test']}: {test['details']}")
+    
+    # Specific analysis for the reported bug
+    bug_confirmed = False
+    for test in tester.test_results:
+        if test['test'] == "Equipment NOT in Pending List After Calibration" and not test['success']:
+            if "still appears in pending list" in test['details']:
+                bug_confirmed = True
+                break
+    
+    if bug_confirmed:
+        print("\n🚨 BUG CONFIRMADO:")
+        print("   El equipo sigue apareciendo en la lista de pendientes después de calibrarse")
+        print("   Esto explica por qué aparece en ambas pestañas (Revisión y Salida)")
+        print("\n🔧 POSIBLES CAUSAS:")
+        print("   1. El filtro en GET /api/equipment/pending no está funcionando correctamente")
+        print("   2. El status del equipo no se está actualizando correctamente en la base de datos")
+        print("   3. Hay un problema de caché o sincronización en la base de datos")
+        return 1
+    elif tester.tests_passed == tester.tests_run:
+        print("\n✅ NO SE DETECTÓ EL BUG:")
+        print("   El filtrado funciona correctamente en el backend")
+        print("   El problema podría estar en el frontend o en la sincronización")
+        return 0
+    else:
+        print(f"\n⚠️ TESTS INCOMPLETOS: {tester.tests_run - tester.tests_passed} tests failed")
+        print("   No se pudo completar la verificación del bug")
+        return 1
+
 if __name__ == "__main__":
     # Check if we should run specific tests
     if len(sys.argv) > 1:
@@ -883,5 +1162,7 @@ if __name__ == "__main__":
             sys.exit(test_fase2_pdf_generation())
         elif sys.argv[1] == "logo_fix":
             sys.exit(test_logo_fix_critical())
+        elif sys.argv[1] == "filter_bug":
+            sys.exit(test_equipment_filtering_bug())
     else:
         sys.exit(main())
