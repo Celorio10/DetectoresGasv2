@@ -289,8 +289,161 @@ export default function EquipmentEntry() {
           </h1>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Buscador de equipo */}
+        {!equipmentFromCatalog && !equipmentNotFound && !showFullForm && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100 mb-6">
+            <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
+              🔍 Buscar Equipo por Número de Serie
+            </h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Introduce el número de serie del equipo. Si está registrado en el catálogo, se cargarán automáticamente sus datos.
+            </p>
+            <div className="flex gap-3">
+              <Input
+                placeholder="Número de Serie..."
+                value={searchSerial}
+                onChange={(e) => setSearchSerial(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleSearchEquipment())}
+                className="flex-1"
+              />
+              <Button 
+                onClick={handleSearchEquipment} 
+                disabled={loading}
+                className="bg-blue-600 hover:bg-blue-700"
+              >
+                {loading ? 'Buscando...' : 'Buscar'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Equipo encontrado - Formulario simplificado */}
+        {equipmentFromCatalog && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold text-green-600" style={{ fontFamily: 'Space Grotesk' }}>
+                ✅ Equipo Encontrado en Catálogo
+              </h2>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={handleResetSearch}
+              >
+                Buscar Otro
+              </Button>
+            </div>
+
+            {/* Datos del equipo (solo lectura) */}
+            <div className="bg-blue-50 rounded-lg p-4 mb-6 border border-blue-200">
+              <h3 className="font-bold mb-3">Datos del Equipo</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                <div>
+                  <span className="font-semibold">Número de Serie:</span> {equipmentFromCatalog.serial_number}
+                </div>
+                <div>
+                  <span className="font-semibold">Marca:</span> {equipmentFromCatalog.brand}
+                </div>
+                <div>
+                  <span className="font-semibold">Modelo:</span> {equipmentFromCatalog.model}
+                </div>
+                <div>
+                  <span className="font-semibold">Cliente:</span> {equipmentFromCatalog.current_client_name}
+                </div>
+                <div>
+                  <span className="font-semibold">Departamento:</span> {equipmentFromCatalog.current_client_departamento || 'N/A'}
+                </div>
+                <div>
+                  <span className="font-semibold">Sensores predefinidos:</span> {equipmentFromCatalog.default_sensors?.length || 0}
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Solo campos editables */}
+              <div>
+                <Label>Fecha de Entrada *</Label>
+                <Input
+                  type="date"
+                  value={formData.entry_date}
+                  onChange={(e) => setFormData({...formData, entry_date: e.target.value})}
+                  required
+                />
+              </div>
+
+              <div>
+                <Label>Observaciones de esta Entrada</Label>
+                <Textarea
+                  value={formData.observations}
+                  onChange={(e) => setFormData({...formData, observations: e.target.value})}
+                  rows={3}
+                  placeholder="Observaciones específicas para esta entrada al taller..."
+                />
+              </div>
+
+              <div className="flex gap-3">
+                <Button 
+                  type="submit" 
+                  disabled={loading}
+                  className="flex-1 bg-blue-600 hover:bg-blue-700"
+                >
+                  {loading ? 'Registrando...' : 'Registrar Entrada al Taller'}
+                </Button>
+                <Button 
+                  type="button" 
+                  variant="outline"
+                  onClick={() => window.location.href = '/catalogo'}
+                >
+                  Editar en Catálogo
+                </Button>
+              </div>
+            </form>
+          </div>
+        )}
+
+        {/* Equipo NO encontrado */}
+        {equipmentNotFound && !showFullForm && (
+          <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100">
+            <div className="text-center mb-6">
+              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-3xl">⚠️</span>
+              </div>
+              <h2 className="text-xl font-bold mb-2">Equipo No Encontrado</h2>
+              <p className="text-gray-600 mb-4">
+                El equipo con número de serie <strong>{searchSerial}</strong> no está registrado en el catálogo maestro.
+              </p>
+              <div className="flex gap-3 justify-center">
+                <Button 
+                  onClick={handleRegisterNewEquipment}
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Registrar Nuevo Equipo
+                </Button>
+                <Button variant="outline" onClick={handleResetSearch}>
+                  Buscar Otro
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Formulario completo para equipo nuevo */}
+        {showFullForm && (
+          <form onSubmit={handleSubmit} className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 border border-gray-100">
+            <div className="flex justify-between items-center mb-6">
+              <h2 className="text-xl font-bold" style={{ fontFamily: 'Space Grotesk' }}>
+                Registrar Nuevo Equipo
+              </h2>
+              <Button 
+                type="button"
+                variant="outline" 
+                size="sm" 
+                onClick={handleResetSearch}
+              >
+                Cancelar
+              </Button>
+            </div>
+            <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Brand */}
               <div>
