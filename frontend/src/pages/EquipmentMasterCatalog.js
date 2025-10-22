@@ -69,6 +69,8 @@ export default function EquipmentMasterCatalog() {
 
   useEffect(() => {
     loadEquipments();
+    loadBrands();
+    loadModels();
     loadClients();
   }, []);
 
