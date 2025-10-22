@@ -306,15 +306,18 @@ frontend:
 
   - task: "Agregar campo de notas internas del técnico en calibración"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py, /app/frontend/src/pages/EquipmentReview.js, /app/frontend/src/pages/EquipmentHistory.js"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Campo 'internal_notes' agregado a modelos CalibrationUpdate y CalibrationHistory. Frontend: campo de texto en EquipmentReview debajo de repuestos con advertencia de que no aparece en certificado. EquipmentHistory: muestra notas internas en panel amarillo cuando se expande calibración. PDF generator NO modificado (las notas no deben aparecer en certificado)."
+      - working: true
+        agent: "testing"
+        comment: "✅ TESTED: Campo internal_notes funciona correctamente. Calibración con notas internas 'Calibración realizada sin problemas. Sensores funcionando correctamente.' se guarda y persiste en calibration_history. Verificado en historial individual del equipo."
 
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
