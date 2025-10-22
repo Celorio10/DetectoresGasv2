@@ -47,20 +47,20 @@ def generate_certificate_pdf(equipment_data, output_path):
     else:
         header_row.append(Paragraph("ASCONSA", styles['Heading1']))
     
-    # Espacio central para número de certificado
+    # Espacio central (vacío ahora)
+    header_row.append(Paragraph("", styles['Normal']))
+    
+    # Número de certificado alineado a la derecha con tamaño aumentado
     cert_number = equipment_data.get('certificate_number', 'N/A')
     cert_style = ParagraphStyle(
         'CertNum',
         parent=styles['Normal'],
-        fontSize=10,
-        alignment=TA_CENTER,
+        fontSize=12,  # Aumentado de 10 a 12 puntos
+        alignment=TA_RIGHT,  # Alineado a la derecha
         fontName='Helvetica-Bold'
     )
     cert_text = f"CERTIFICADO Nº<br/>{cert_number}"
     header_row.append(Paragraph(cert_text, cert_style))
-    
-    # Logo MSA derecha (placeholder si no existe)
-    header_row.append(Paragraph("", styles['Normal']))  # MSA logo placeholder
     
     header_data.append(header_row)
     
