@@ -351,7 +351,7 @@ export default function EquipmentHistory() {
                                   </div>
 
                                   {/* Notas Internas del Técnico */}
-                                  {calibration.internal_notes && (
+                                  {calibration.internal_notes && calibration.internal_notes.trim() !== "" && (
                                     <div className="mb-4 mt-4 border-t pt-4">
                                       <h5 className="font-bold text-sm mb-2 flex items-center gap-2">
                                         📝 Notas Internas del Técnico
