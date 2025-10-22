@@ -406,7 +406,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Eliminar equipo calibrado de lista de equipos pendientes en pestaña Revisión"
+    - "Flujo completo de calibración y aparición en Historial y Resumen"
   stuck_tasks: []
   test_all: false
   test_priority: "critical_first"
