@@ -673,6 +673,7 @@ export default function EquipmentEntry() {
             >
               {loading ? 'Guardando...' : 'Registrar Equipo'}
             </Button>
+            </div>
           </form>
         )}
       </div>
