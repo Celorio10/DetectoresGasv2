@@ -274,8 +274,11 @@ export default function EquipmentReview() {
       }]);
       setSpareParts([]);
       setSelectedTechnician("");
-      // Recargar lista de equipos pendientes
-      loadPendingEquipment();
+      // Recargar lista de equipos pendientes con un pequeño delay
+      // para asegurar que el backend haya completado la actualización
+      setTimeout(() => {
+        loadPendingEquipment();
+      }, 500);
     } catch (error) {
       toast.error(error.response?.data?.detail || 'Error al calibrar equipo');
     } finally {
