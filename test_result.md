@@ -232,6 +232,24 @@ frontend:
         agent: "main"
         comment: "Descarga automática de PDF implementada en handleSubmit después de calibrar equipo exitosamente"
 
+  - task: "Eliminar equipo calibrado de lista de equipos pendientes en pestaña Revisión"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/pages/EquipmentReview.js"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: true
+    status_history:
+      - working: false
+        agent: "user"
+        comment: "Problema reportado: Después de calibrar un equipo, este aparece en Salida pero sigue apareciendo en la pestaña Revisión. Debería desaparecer de Revisión una vez calibrado."
+      - working: "NA"
+        agent: "testing"
+        comment: "Backend verificado y funciona correctamente. El endpoint /api/equipment/pending filtra correctamente por status 'pending'. El equipo calibrado NO aparece en la lista del backend."
+      - working: "NA"
+        agent: "main"
+        comment: "Agregado delay de 500ms antes de recargar la lista de equipos pendientes (loadPendingEquipment) para asegurar sincronización correcta del estado de React después de calibrar."
+
 pdf:
   - task: "Crear módulo de generación de PDF con ReportLab"
     implemented: true
