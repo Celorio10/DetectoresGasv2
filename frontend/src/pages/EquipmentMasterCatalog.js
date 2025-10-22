@@ -304,29 +304,124 @@ export default function EquipmentMasterCatalog() {
                 {/* Cliente actual */}
                 <div className="border-t pt-4">
                   <h3 className="font-bold mb-3">Cliente Actual</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <Label>Nombre Cliente</Label>
-                      <Input
-                        value={formData.current_client_name}
-                        onChange={(e) => setFormData({...formData, current_client_name: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <Label>CIF</Label>
-                      <Input
-                        value={formData.current_client_cif}
-                        onChange={(e) => setFormData({...formData, current_client_cif: e.target.value})}
-                      />
-                    </div>
-                    <div>
-                      <Label>Departamento</Label>
-                      <Input
-                        value={formData.current_client_departamento}
-                        onChange={(e) => setFormData({...formData, current_client_departamento: e.target.value})}
-                      />
+                  
+                  {/* Selector de cliente */}
+                  <div className="mb-4">
+                    <Label>Cliente</Label>
+                    <div className="flex gap-2">
+                      <Select onValueChange={handleClientSelect}>
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder={formData.current_client_name || "Selecciona un cliente"} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {clients.map((client) => (
+                            <SelectItem key={client.id} value={client.id}>
+                              {client.name} - {client.cif}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <Dialog open={clientDialogOpen} onOpenChange={setClientDialogOpen}>
+                        <DialogTrigger asChild>
+                          <Button type="button" variant="outline">
+                            <Plus className="w-4 h-4" />
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Añadir Nuevo Cliente</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label>Nombre del Cliente</Label>
+                              <Input
+                                value={newClient.name}
+                                onChange={(e) => setNewClient({...newClient, name: e.target.value})}
+                                placeholder="Ej: ASCONSA"
+                              />
+                            </div>
+                            <div>
+                              <Label>CIF</Label>
+                              <Input
+                                value={newClient.cif}
+                                onChange={(e) => setNewClient({...newClient, cif: e.target.value})}
+                                placeholder="Ej: B12345678"
+                              />
+                            </div>
+                            <div>
+                              <Label>Departamentos</Label>
+                              <div className="flex gap-2 mb-2">
+                                <Input
+                                  value={newDepartamento}
+                                  onChange={(e) => setNewDepartamento(e.target.value)}
+                                  placeholder="Nombre del departamento"
+                                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddDepartamento())}
+                                />
+                                <Button type="button" onClick={handleAddDepartamento} size="sm">
+                                  <Plus className="w-4 h-4" />
+                                </Button>
+                              </div>
+                              {newClient.departamentos.length > 0 && (
+                                <div className="flex flex-wrap gap-2">
+                                  {newClient.departamentos.map((dept, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm flex items-center gap-2"
+                                    >
+                                      {dept}
+                                      <button
+                                        type="button"
+                                        onClick={() => handleRemoveDepartamento(dept)}
+                                        className="text-blue-600 hover:text-blue-800"
+                                      >
+                                        ×
+                                      </button>
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                            <Button type="button" onClick={handleAddClient} className="w-full">
+                              Guardar Cliente
+                            </Button>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
                     </div>
                   </div>
+
+                  {/* Selector de departamento */}
+                  {selectedClientDepartamentos.length > 0 && (
+                    <div>
+                      <Label>Departamento</Label>
+                      <Select 
+                        value={formData.current_client_departamento}
+                        onValueChange={(value) => setFormData({...formData, current_client_departamento: value})}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Selecciona departamento" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {selectedClientDepartamentos.map((dept, idx) => (
+                            <SelectItem key={idx} value={dept}>
+                              {dept}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
+
+                  {/* Mostrar datos del cliente seleccionado */}
+                  {formData.current_client_name && (
+                    <div className="mt-3 p-3 bg-blue-50 rounded border border-blue-200">
+                      <p className="text-sm"><strong>Cliente:</strong> {formData.current_client_name}</p>
+                      <p className="text-sm"><strong>CIF:</strong> {formData.current_client_cif}</p>
+                      {formData.current_client_departamento && (
+                        <p className="text-sm"><strong>Departamento:</strong> {formData.current_client_departamento}</p>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Sensores predeterminados */}
