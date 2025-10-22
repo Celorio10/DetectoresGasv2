@@ -129,6 +129,7 @@ class CalibrationHistory(BaseModel):
     spare_parts: Optional[List[dict]] = None
     calibration_date: str
     technician: str
+    internal_notes: str = ""  # Notas internas del técnico
     delivery_note: Optional[str] = None
     certificate_number: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
