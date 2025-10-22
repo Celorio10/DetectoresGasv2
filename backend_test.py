@@ -922,10 +922,10 @@ def test_equipment_filtering_bug():
     print("\n📋 SETUP TEST DATA")
     print("-" * 20)
     
-    # Create required master data
-    tester.run_test("Create Brand", "POST", "brands", 200, data={"name": "Honeywell"})
-    tester.run_test("Create Model", "POST", "models", 200, data={"name": "XT-1000"})
-    tester.run_test("Create Technician", "POST", "technicians", 200, data={"name": "Juan Pérez"})
+    # Create required master data (ignore if already exists)
+    tester.run_test("Create Brand", "POST", "brands", [200, 400], data={"name": "Honeywell"})
+    tester.run_test("Create Model", "POST", "models", [200, 400], data={"name": "XT-1000"})
+    tester.run_test("Create Technician", "POST", "technicians", [200, 400], data={"name": "Juan Pérez"})
     
     client_data = {
         "name": "Empresa Test Filtrado",
