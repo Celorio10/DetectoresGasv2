@@ -515,3 +515,30 @@ agent_communication:
       4. Problema en el estado local del componente React
       
       ✅ BACKEND VERIFICATION COMPLETE - NO ISSUES FOUND
+  - agent: "main"
+    message: |
+      🔧 FIX FRONTEND: Eliminar equipo calibrado de lista pendientes
+      
+      PROBLEMA IDENTIFICADO:
+      - Backend funciona correctamente (verificado por testing agent)
+      - El problema está en el frontend: sincronización del estado de React
+      - La lista de equipos pendientes no se actualiza inmediatamente después de calibrar
+      
+      SOLUCIÓN IMPLEMENTADA:
+      - Archivo modificado: /app/frontend/src/pages/EquipmentReview.js (línea 277-281)
+      - Agregado delay de 500ms antes de llamar a loadPendingEquipment()
+      - Esto asegura que el estado de React se sincronice correctamente
+      - Código anterior: loadPendingEquipment() se llamaba inmediatamente
+      - Código nuevo: setTimeout(() => { loadPendingEquipment(); }, 500);
+      
+      TESTING REQUERIDO:
+      1. Crear un equipo nuevo con estado "pending"
+      2. Verificar que aparece en la pestaña "Revisión"
+      3. Seleccionar el equipo y calibrarlo
+      4. Verificar que después de calibrar:
+         - El equipo aparece en la pestaña "Salida" ✅
+         - El equipo DESAPARECE de la pestaña "Revisión" ✅
+         - La lista de equipos pendientes se actualiza correctamente
+      
+      PRÓXIMO PASO:
+      - Frontend testing para verificar el fix
