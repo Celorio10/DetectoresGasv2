@@ -77,6 +77,30 @@ class Technician(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     name: str
 
+class SensorDefault(BaseModel):
+    """Sensor predeterminado con valores de Pre-Alarma, Alarma y Calibración"""
+    model_config = ConfigDict(extra="ignore")
+    sensor: str
+    pre_alarm: str = ""
+    alarm: str = ""
+    calibration_value: str = ""
+
+class EquipmentMaster(BaseModel):
+    """Catálogo maestro de equipos - Información permanente del equipo"""
+    model_config = ConfigDict(extra="ignore")
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    serial_number: str  # Único e inmutable
+    brand: str
+    model: str
+    current_client_name: str = ""
+    current_client_cif: str = ""
+    current_client_departamento: str = ""
+    default_sensors: List[SensorDefault] = Field(default_factory=list)
+    general_observations: str = ""
+    created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    updated_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    last_workshop_entry: Optional[str] = None
+
 class EquipmentCatalog(BaseModel):
     model_config = ConfigDict(extra="ignore")
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
