@@ -237,11 +237,42 @@ export default function EquipmentHistory() {
                         <tr className="bg-blue-50">
                           <td></td>
                           <td colSpan="5" className="p-4">
-                            <div className="space-y-4">
-                              {/* Tabla de Calibración */}
-                              <div>
-                                <h3 className="font-bold text-sm mb-2">Datos de Calibración</h3>
-                                {item.calibration_data && item.calibration_data.length > 0 ? (
+                            <div className="space-y-6">
+                              <h3 className="text-lg font-bold mb-4">📋 Historial de Calibraciones</h3>
+                              
+                              {equipment.calibrations.map((calibration, calIdx) => (
+                                <div key={calIdx} className="bg-white rounded-lg border-2 border-gray-200 p-4 mb-4">
+                                  {/* Encabezado de la calibración */}
+                                  <div className="flex justify-between items-start mb-4 pb-3 border-b">
+                                    <div>
+                                      <h4 className="font-bold text-md mb-1">
+                                        Calibración #{equipment.calibrations.length - calIdx}
+                                      </h4>
+                                      <p className="text-sm text-gray-600">
+                                        📅 Fecha: <span className="font-semibold">{calibration.calibration_date}</span>
+                                      </p>
+                                      <p className="text-sm text-gray-600">
+                                        👤 Técnico: <span className="font-semibold">{calibration.technician}</span>
+                                      </p>
+                                    </div>
+                                    <Button 
+                                      size="sm" 
+                                      onClick={() => handleDownloadCertificate(
+                                        calibration.id, 
+                                        equipment.serial_number, 
+                                        calibration.calibration_date
+                                      )}
+                                      className="bg-purple-600 hover:bg-purple-700"
+                                    >
+                                      <Download className="w-4 h-4 mr-1" />
+                                      Certificado
+                                    </Button>
+                                  </div>
+
+                                  {/* Tabla de Calibración */}
+                                  <div className="mb-4">
+                                    <h5 className="font-bold text-sm mb-2">Datos de Calibración</h5>
+                                    {calibration.calibration_data && calibration.calibration_data.length > 0 ? (
                                   <div className="overflow-x-auto">
                                     <table className="w-full text-sm border">
                                       <thead className="bg-gray-100">
