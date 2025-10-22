@@ -184,6 +184,7 @@ class CalibrationUpdate(BaseModel):
     spare_parts: List[SparePart] = []
     calibration_date: str
     technician: str
+    internal_notes: str = ""  # Notas internas del técnico (no aparecen en PDF)
 
 class DeliveryUpdate(BaseModel):
     serial_numbers: List[str]
