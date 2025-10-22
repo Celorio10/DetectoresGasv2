@@ -330,9 +330,17 @@ async def get_equipment_catalog_by_serial(serial_number: str, current_user: dict
 
 @api_router.post("/equipment", response_model=Equipment)
 async def create_equipment(equipment_data: EquipmentCreate, current_user: dict = Depends(get_current_user)):
-    existing = await db.equipment.find_one({"serial_number": equipment_data.serial_number, "status": {"$ne": "delivered"}})
+    # Validación más estricta: buscar cualquier equipo con el mismo serial que no esté delivered
+    existing = await db.equipment.find_one({
+        "serial_number": equipment_data.serial_number, 
+        "status": {"$in": ["pending", "calibrated"]}
+    })
     if existing:
-        raise HTTPException(status_code=400, detail="Equipment with this serial number already in workshop")
+        status_msg = existing.get('status', 'unknown')
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Equipment with serial number '{equipment_data.serial_number}' already exists in workshop with status '{status_msg}'"
+        )
     
     equipment = Equipment(**equipment_data.model_dump())
     await db.equipment.insert_one(equipment.model_dump())
