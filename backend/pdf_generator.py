@@ -212,8 +212,9 @@ def generate_certificate_pdf(equipment_data, output_path):
             ]
             cal_rows.append(row)
         
-        # Calcular anchos para llenar el espacio disponible
-        col_widths = [35*mm, 18*mm, 18*mm, 20*mm, 18*mm, 18*mm, 25*mm, 15*mm]
+        # Anchos ampliados para que textos quepan en una línea (185mm total)
+        # GAS/SENSOR, PRE-ALARMA, ALARMA, VALOR CAL., ZERO, SPAN, Nº BOTELLA, APTO
+        col_widths = [35*mm, 22*mm, 20*mm, 22*mm, 18*mm, 18*mm, 30*mm, 20*mm]
         cal_table = Table(cal_rows, colWidths=col_widths)
         cal_table.setStyle(TableStyle([
             ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
