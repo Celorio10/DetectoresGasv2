@@ -18,8 +18,11 @@ const getAuthHeaders = () => ({
 
 export default function EquipmentMasterCatalog() {
   const [equipments, setEquipments] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [selectedClientDepartamentos, setSelectedClientDepartamentos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [clientDialogOpen, setClientDialogOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [currentEquipment, setCurrentEquipment] = useState(null);
   
@@ -43,6 +46,10 @@ export default function EquipmentMasterCatalog() {
     general_observations: ""
   });
 
+  // Nuevo cliente
+  const [newClient, setNewClient] = useState({ name: "", cif: "", departamentos: [] });
+  const [newDepartamento, setNewDepartamento] = useState("");
+
   // Nuevo sensor
   const [newSensor, setNewSensor] = useState({
     sensor: "",
@@ -53,6 +60,7 @@ export default function EquipmentMasterCatalog() {
 
   useEffect(() => {
     loadEquipments();
+    loadClients();
   }, []);
 
   const loadEquipments = async () => {
