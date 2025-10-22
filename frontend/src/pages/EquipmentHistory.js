@@ -246,7 +246,8 @@ export default function EquipmentHistory() {
                                   <div className="flex justify-between items-start mb-4 pb-3 border-b">
                                     <div>
                                       <h4 className="font-bold text-md mb-1">
-                                        Calibración #{equipment.calibrations.length - calIdx}
+                                        Calibración #{calIdx + 1}
+                                        {calIdx === 0 && <span className="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Más Reciente</span>}
                                       </h4>
                                       <p className="text-sm text-gray-600">
                                         📅 Fecha: <span className="font-semibold">{calibration.calibration_date}</span>
