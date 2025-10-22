@@ -172,29 +172,25 @@ export default function EquipmentHistory() {
         ) : equipments.length > 0 ? (
           <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
             <h2 className="text-xl font-bold mb-4" style={{ fontFamily: 'Space Grotesk' }}>
-              Todos los Equipos Revisados
+              Resultados de Búsqueda
             </h2>
             <p className="text-sm text-gray-600 mb-4">
-              Total de calibraciones: {history.length}
+              Total de equipos encontrados: {equipments.length}
             </p>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b bg-gray-50">
-                    <th className="text-left p-3 text-sm font-semibold">Ver Detalles</th>
-                    <th className="text-left p-3 text-sm font-semibold">Fecha Calibración</th>
+                    <th className="text-left p-3 text-sm font-semibold w-16"></th>
                     <th className="text-left p-3 text-sm font-semibold">Nº Serie</th>
                     <th className="text-left p-3 text-sm font-semibold">Marca</th>
                     <th className="text-left p-3 text-sm font-semibold">Modelo</th>
                     <th className="text-left p-3 text-sm font-semibold">Cliente</th>
                     <th className="text-left p-3 text-sm font-semibold">Departamento</th>
-                    <th className="text-left p-3 text-sm font-semibold">Técnico</th>
-                    <th className="text-center p-3 text-sm font-semibold">Estado</th>
-                    <th className="text-center p-3 text-sm font-semibold">Certificado</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {history.map((item) => (
+                  {equipments.map((equipment) => (
                     <>
                       <tr 
                         key={item.id} 
