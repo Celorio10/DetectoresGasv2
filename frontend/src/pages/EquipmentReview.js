@@ -605,6 +605,26 @@ export default function EquipmentReview() {
                 </div>
               </div>
 
+              {/* Notas Internas del Técnico */}
+              <div className="border-t pt-6">
+                <Label htmlFor="internal_notes">
+                  📝 Notas Internas del Técnico
+                  <span className="text-xs text-gray-500 ml-2">(No aparecen en el certificado)</span>
+                </Label>
+                <Textarea
+                  id="internal_notes"
+                  value={internalNotes}
+                  onChange={(e) => setInternalNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Notas, observaciones o comentarios internos que solo verás en el historial..."
+                  className="mt-2"
+                  data-testid="internal-notes-input"
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  ℹ️ Estas notas solo serán visibles en el historial de calibraciones, no se incluyen en el certificado PDF.
+                </p>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="calibration_date">Fecha de Calibración</Label>
