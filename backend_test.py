@@ -932,8 +932,8 @@ def test_equipment_filtering_bug():
     tester.run_test("Create Technician", "POST", "technicians", [200, 400], data={"name": "Juan Pérez"})
     
     client_data = {
-        "name": "Empresa Test Filtrado",
-        "cif": "B99887766",
+        "name": f"Empresa Test Filtrado {datetime.now().strftime('%H%M%S')}",
+        "cif": f"B{datetime.now().strftime('%H%M%S')}",
         "departamento": "Mantenimiento"
     }
     tester.run_test("Create Client", "POST", "clients", 200, data=client_data)
