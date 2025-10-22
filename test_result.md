@@ -465,3 +465,34 @@ agent_communication:
       🚀 CONCLUSIÓN: EL FIX RESUELVE COMPLETAMENTE EL PROBLEMA REPORTADO POR EL USUARIO
       ✅ El ajuste de dimensiones del logo en pdf_generator.py línea 44 funciona correctamente
       ✅ No hay más errores de page overflow al generar certificados PDF
+  - agent: "testing"
+    message: |
+      🔍 DEBUGGING COMPLETADO: Verificación de filtrado de equipos después de calibración
+      
+      ✅ RESULTADO DEL DEBUGGING:
+      - BACKEND FUNCIONA CORRECTAMENTE: El filtrado de equipos por estado funciona perfectamente
+      - NO SE DETECTÓ EL BUG REPORTADO en el backend
+      
+      📋 TESTS EJECUTADOS (16/16 PASARON):
+      1. ✅ Equipo creado con status "pending" correctamente
+      2. ✅ Equipo aparece en GET /api/equipment/pending antes de calibración
+      3. ✅ Calibración exitosa cambia status a "calibrated"
+      4. ✅ Equipo tiene status "calibrated" en base de datos después de calibración
+      5. ✅ Equipo NO aparece en GET /api/equipment/pending después de calibración
+      6. ✅ Equipo SÍ aparece en GET /api/equipment/calibrated después de calibración
+      
+      🔍 ANÁLISIS DETALLADO:
+      - Lista PENDING después de calibración: 2 equipos (ninguno es el recién calibrado)
+      - Lista CALIBRATED: 3 equipos (incluye el recién calibrado)
+      - El filtrado por status funciona correctamente en todos los endpoints
+      
+      🚨 CONCLUSIÓN IMPORTANTE:
+      El problema reportado por el usuario NO está en el backend. El backend filtra correctamente los equipos por estado.
+      
+      🔧 POSIBLES CAUSAS DEL PROBLEMA EN FRONTEND:
+      1. El frontend podría estar cacheando datos antiguos
+      2. Problema de sincronización entre pestañas
+      3. El frontend no está refrescando la lista después de calibrar
+      4. Problema en el estado local del componente React
+      
+      ✅ BACKEND VERIFICATION COMPLETE - NO ISSUES FOUND
