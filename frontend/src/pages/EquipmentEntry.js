@@ -21,6 +21,13 @@ export default function EquipmentEntry() {
   const [brands, setBrands] = useState([]);
   const [models, setModels] = useState([]);
   const [clients, setClients] = useState([]);
+  
+  // Estado para búsqueda de equipo en catálogo maestro
+  const [searchSerial, setSearchSerial] = useState("");
+  const [equipmentFromCatalog, setEquipmentFromCatalog] = useState(null);
+  const [equipmentNotFound, setEquipmentNotFound] = useState(false);
+  const [showFullForm, setShowFullForm] = useState(false);
+  
   const [formData, setFormData] = useState({
     brand: "",
     model: "",
@@ -40,6 +47,7 @@ export default function EquipmentEntry() {
   const [brandDialogOpen, setBrandDialogOpen] = useState(false);
   const [modelDialogOpen, setModelDialogOpen] = useState(false);
   const [clientDialogOpen, setClientDialogOpen] = useState(false);
+  const [catalogDialogOpen, setCatalogDialogOpen] = useState(false);
 
   useEffect(() => {
     loadData();
