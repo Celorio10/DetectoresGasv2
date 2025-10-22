@@ -273,93 +273,90 @@ export default function EquipmentHistory() {
                                   <div className="mb-4">
                                     <h5 className="font-bold text-sm mb-2">Datos de Calibración</h5>
                                     {calibration.calibration_data && calibration.calibration_data.length > 0 ? (
-                                  <div className="overflow-x-auto">
-                                    <table className="w-full text-sm border">
-                                      <thead className="bg-gray-100">
-                                        <tr>
-                                          <th className="border p-2 text-left">Sensor</th>
-                                          <th className="border p-2 text-left">Pre-Alarma</th>
-                                          <th className="border p-2 text-left">Alarma</th>
-                                          <th className="border p-2 text-left">Valor Cal.</th>
-                                          <th className="border p-2 text-left">Zero</th>
-                                          <th className="border p-2 text-left">SPAN</th>
-                                          <th className="border p-2 text-left">Botella</th>
-                                          <th className="border p-2 text-center">APTO</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white">
-                                        {item.calibration_data.map((sensor, idx) => (
-                                          <tr key={idx}>
-                                            <td className="border p-2">{sensor.sensor}</td>
-                                            <td className="border p-2">{sensor.pre_alarm}</td>
-                                            <td className="border p-2">{sensor.alarm}</td>
-                                            <td className="border p-2">{sensor.calibration_value}</td>
-                                            <td className="border p-2">{sensor.valor_zero}</td>
-                                            <td className="border p-2">{sensor.valor_span}</td>
-                                            <td className="border p-2">{sensor.calibration_bottle}</td>
-                                            <td className="border p-2 text-center">
-                                              <span className={`px-2 py-1 rounded text-xs ${sensor.approved ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                {sensor.approved ? 'SÍ' : 'NO'}
-                                              </span>
-                                            </td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
+                                      <div className="overflow-x-auto">
+                                        <table className="w-full text-xs border">
+                                          <thead className="bg-gray-100">
+                                            <tr>
+                                              <th className="border p-2 text-left">Sensor</th>
+                                              <th className="border p-2 text-left">Pre-A</th>
+                                              <th className="border p-2 text-left">Alarma</th>
+                                              <th className="border p-2 text-left">Val. Cal.</th>
+                                              <th className="border p-2 text-left">Zero</th>
+                                              <th className="border p-2 text-left">SPAN</th>
+                                              <th className="border p-2 text-left">Botella</th>
+                                              <th className="border p-2 text-center">APTO</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody className="bg-white">
+                                            {calibration.calibration_data.map((sensor, idx) => (
+                                              <tr key={idx}>
+                                                <td className="border p-2">{sensor.sensor}</td>
+                                                <td className="border p-2">{sensor.pre_alarm}</td>
+                                                <td className="border p-2">{sensor.alarm}</td>
+                                                <td className="border p-2">{sensor.calibration_value}</td>
+                                                <td className="border p-2">{sensor.valor_zero}</td>
+                                                <td className="border p-2">{sensor.valor_span}</td>
+                                                <td className="border p-2">{sensor.calibration_bottle}</td>
+                                                <td className="border p-2 text-center">
+                                                  <span className={`px-2 py-1 rounded text-xs ${sensor.approved ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                                                    {sensor.approved ? 'SÍ' : 'NO'}
+                                                  </span>
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    ) : (
+                                      <p className="text-gray-500 text-sm">No hay datos de calibración</p>
+                                    )}
                                   </div>
-                                ) : (
-                                  <p className="text-gray-500 text-sm">No hay datos de calibración</p>
-                                )}
-                              </div>
 
-                              {/* Repuestos Utilizados */}
-                              <div>
-                                <h3 className="font-bold text-sm mb-2">Repuestos Utilizados</h3>
-                                {item.spare_parts && item.spare_parts.length > 0 ? (
-                                  <div className="overflow-x-auto">
-                                    <table className="w-full text-sm border">
-                                      <thead className="bg-gray-100">
-                                        <tr>
-                                          <th className="border p-2 text-left">Descripción</th>
-                                          <th className="border p-2 text-left">Referencia</th>
-                                          <th className="border p-2 text-center">Garantía</th>
-                                        </tr>
-                                      </thead>
-                                      <tbody className="bg-white">
-                                        {item.spare_parts.map((part, idx) => (
-                                          <tr key={idx}>
-                                            <td className="border p-2">{part.descripcion}</td>
-                                            <td className="border p-2">{part.referencia}</td>
-                                            <td className="border p-2 text-center">
-                                              {part.garantia ? (
-                                                <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                                                  SÍ
-                                                </span>
-                                              ) : (
-                                                <span className="text-gray-500">NO</span>
-                                              )}
-                                            </td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
+                                  {/* Repuestos Utilizados */}
+                                  <div className="mb-4">
+                                    <h5 className="font-bold text-sm mb-2">🔧 Repuestos Utilizados</h5>
+                                    {calibration.spare_parts && calibration.spare_parts.length > 0 ? (
+                                      <div className="overflow-x-auto">
+                                        <table className="w-full text-xs border">
+                                          <thead className="bg-gray-100">
+                                            <tr>
+                                              <th className="border p-2 text-left">Descripción</th>
+                                              <th className="border p-2 text-left">Referencia</th>
+                                              <th className="border p-2 text-center">Garantía</th>
+                                            </tr>
+                                          </thead>
+                                          <tbody className="bg-white">
+                                            {calibration.spare_parts.map((part, idx) => (
+                                              <tr key={idx}>
+                                                <td className="border p-2">{part.descripcion}</td>
+                                                <td className="border p-2">{part.referencia}</td>
+                                                <td className="border p-2 text-center">
+                                                  {part.garantia ? (
+                                                    <span className="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                                                      GARANTÍA
+                                                    </span>
+                                                  ) : (
+                                                    <span className="text-gray-500">NO</span>
+                                                  )}
+                                                </td>
+                                              </tr>
+                                            ))}
+                                          </tbody>
+                                        </table>
+                                      </div>
+                                    ) : (
+                                      <p className="text-sm text-gray-500">Ninguno</p>
+                                    )}
                                   </div>
-                                ) : (
-                                  <div className="bg-white border rounded p-3">
-                                    <p className="text-sm text-gray-500">Ninguno</p>
-                                  </div>
-                                )}
-                              </div>
 
-                              {/* Observaciones */}
-                              {item.observations && (
-                                <div>
-                                  <h3 className="font-bold text-sm mb-2">Observaciones</h3>
-                                  <div className="bg-white border rounded p-3">
-                                    <p className="text-sm">{item.observations}</p>
+                                  {/* Estado General */}
+                                  <div>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getEstadoColor(calibration.calibration_data)}`}>
+                                      Estado: {getEstadoText(calibration.calibration_data)}
+                                    </span>
                                   </div>
                                 </div>
-                              )}
+                              ))}
                             </div>
                           </td>
                         </tr>
