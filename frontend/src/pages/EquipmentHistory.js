@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import Layout from "../components/Layout";
-import { History, Download, ChevronDown, ChevronUp } from "lucide-react";
+import { History, Download, ChevronDown, ChevronUp, Search, X } from "lucide-react";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
@@ -13,28 +15,52 @@ const getAuthHeaders = () => ({
 });
 
 export default function EquipmentHistory() {
-  const [history, setHistory] = useState([]);
-  const [expandedHistory, setExpandedHistory] = useState(null);
+  const [equipments, setEquipments] = useState([]);
+  const [expandedEquipment, setExpandedEquipment] = useState(null);
   const [loading, setLoading] = useState(false);
+  
+  // Filtros de búsqueda
+  const [filters, setFilters] = useState({
+    cliente: "",
+    modelo: "",
+    serial: ""
+  });
 
   useEffect(() => {
-    loadAllHistory();
+    handleSearch();
   }, []);
 
-  const loadAllHistory = async () => {
+  const handleSearch = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${API}/calibration-history/all`, getAuthHeaders());
-      setHistory(response.data);
+      const params = new URLSearchParams();
+      if (filters.cliente) params.append('cliente', filters.cliente);
+      if (filters.modelo) params.append('modelo', filters.modelo);
+      if (filters.serial) params.append('serial', filters.serial);
+      
+      const response = await axios.get(
+        `${API}/calibration-history/search?${params.toString()}`,
+        getAuthHeaders()
+      );
+      
+      setEquipments(response.data);
       if (response.data.length === 0) {
-        toast.info('No hay historial de calibraciones aún');
+        toast.info('No se encontraron equipos con los filtros especificados');
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Error al cargar historial');
-      setHistory([]);
+      toast.error(error.response?.data?.detail || 'Error al buscar historial');
+      setEquipments([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClearFilters = () => {
+    setFilters({ cliente: "", modelo: "", serial: "" });
+    // Recargar todo después de limpiar
+    setTimeout(() => {
+      handleSearch();
+    }, 100);
   };
 
   const handleToggleExpand = (historyId) => {
