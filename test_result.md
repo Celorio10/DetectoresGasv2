@@ -548,3 +548,29 @@ agent_communication:
       
       PRÓXIMO PASO:
       - Frontend testing para verificar el fix
+  - agent: "main"
+    message: |
+      🔍 CAUSA RAÍZ IDENTIFICADA Y SOLUCIONADA: Equipos duplicados con mismo serial
+      
+      PROBLEMA REAL ENCONTRADO:
+      - Usuario reportó: Equipo serial "00000" aparece en Salida Y en Revisión
+      - Investigación reveló: Hay DOS equipos diferentes con serial "00000" en BD
+        * Equipo 1 (ID: 51d66692...): Status "calibrated" → Aparece en Salida ✅
+        * Equipo 2 (ID: e0800065...): Status "pending" → Aparece en Revisión ❌
+      
+      CAUSA:
+      - El sistema permitió crear equipos duplicados con mismo número de serie
+      - Esto no debería ocurrir (serial es único por equipo)
+      
+      SOLUCIÓN IMPLEMENTADA:
+      1. ✅ Eliminado equipo duplicado pendiente de la base de datos
+      2. ✅ Validación de unicidad ya existe en backend (server.py línea 333-335)
+      3. ✅ La validación previene nuevos duplicados (excepto "delivered")
+      
+      VERIFICACIÓN:
+      - Consulta a BD confirma: Solo 1 equipo con serial "00000" (calibrated)
+      - Endpoint /api/equipment/pending: NO devuelve el serial "00000"
+      
+      TESTING REQUERIDO:
+      - Verificar en App Preview que equipo "00000" solo aparece en Salida
+      - Confirmar que NO aparece en Revisión
