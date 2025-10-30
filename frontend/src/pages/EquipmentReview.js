@@ -284,6 +284,7 @@ export default function EquipmentReview() {
       }]);
       setSpareParts([]);
       setInternalNotes("");
+      setUseDepartmentAsClient(false);
       setSelectedTechnician("");
       // Recargar lista de equipos pendientes con un pequeño delay
       // para asegurar que el backend haya completado la actualización
