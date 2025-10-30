@@ -755,3 +755,77 @@ agent_communication:
       2. Ir a Revisión y calibrar TEST-DEBUG-001
       3. Verificar que desaparece de Revisión inmediatamente
       4. Verificar que aparece en Salida
+
+  - agent: "main"
+    message: |
+      🎯 NUEVAS FUNCIONALIDADES IMPLEMENTADAS
+      
+      **MEJORA 1: Gestión de Clientes con Departamentos**
+      
+      Backend:
+      1. ✅ Agregados endpoints CRUD completos para clientes:
+         - PUT /api/clients/{client_id} - Actualizar cliente incluyendo departamentos
+         - DELETE /api/clients/{client_id} - Eliminar cliente
+      2. ✅ Validación mejorada para evitar duplicados de CIF
+      3. ✅ Modelo Client ya incluía campo departamentos: List[str]
+      
+      Frontend:
+      1. ✅ Nueva página "Gestión de Clientes" (/clientes):
+         - Tabla completa con nombre, CIF y lista de departamentos
+         - Modal para crear/editar clientes
+         - Gestión dinámica de departamentos (agregar/eliminar)
+         - Botones de editar y eliminar por cliente
+         - Confirmación antes de eliminar
+      2. ✅ Agregada ruta /clientes en App.js
+      3. ✅ Agregado enlace "Clientes" en menú lateral (icono Users de lucide-react)
+      
+      **MEJORA 2: Checkbox Departamento como Cliente en Certificado**
+      
+      Backend:
+      1. ✅ Campo use_department_as_client agregado a:
+         - CalibrationUpdate model (línea 189)
+         - CalibrationHistory model (línea 133)
+         - Equipment model (línea 167)
+      2. ✅ Endpoint PUT /equipment/{serial}/calibrate actualizado:
+         - Guarda use_department_as_client en equipment
+         - Guarda use_department_as_client en calibration_history
+      3. ✅ Endpoint GET /calibration-history/search actualizado:
+         - Incluye use_department_as_client en respuesta (línea 628)
+      4. ✅ pdf_generator.py modificado (líneas 92-107):
+         - Si use_department_as_client=True: 
+           * CLIENTE = departamento
+           * LOCALIDAD = vacío
+         - Si False (comportamiento normal):
+           * CLIENTE = client_name
+           * LOCALIDAD = client_departamento
+      
+      Frontend:
+      1. ✅ EquipmentReview.js actualizado:
+         - Agregado estado useDepartmentAsClient
+         - Checkbox después de notas internas con texto explicativo
+         - handleSubmit envía use_department_as_client al backend
+         - Reset del checkbox después de calibrar
+      2. ✅ EquipmentHistory.js actualizado:
+         - Muestra indicador azul cuando use_department_as_client=true
+         - Explica que el certificado usó departamento como cliente
+      
+      **TESTING REQUERIDO:**
+      
+      Test 1 - Gestión de Clientes:
+      1. Navegar a /clientes (nuevo enlace en menú)
+      2. Crear nuevo cliente con nombre, CIF y múltiples departamentos
+      3. Editar cliente existente y modificar departamentos
+      4. Eliminar un departamento de un cliente
+      5. Eliminar un cliente completo
+      6. Verificar validación de CIF duplicado
+      
+      Test 2 - Checkbox Departamento como Cliente:
+      1. Crear equipo con Cliente="Intermediario S.A." y Departamento="Cliente Final ABC"
+      2. Calibrar equipo en Revisión
+      3. Marcar checkbox "Usar nombre del Departamento como cliente final"
+      4. Completar calibración y entregar equipo
+      5. Descargar certificado PDF y verificar:
+         - CLIENTE debe mostrar "Cliente Final ABC"
+         - LOCALIDAD debe estar vacío
+      6. Verificar en Historial que aparece indicador azul
+      7. Repetir test SIN marcar checkbox y verificar comportamiento normal
