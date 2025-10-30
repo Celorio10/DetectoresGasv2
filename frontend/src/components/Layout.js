@@ -18,6 +18,7 @@ export default function Layout({ children }) {
   const menuItems = [
     { path: "/", label: "Inicio", icon: Home, testId: "nav-home" },
     { path: "/catalogo", label: "Catálogo", icon: Database, testId: "nav-catalogo" },
+    { path: "/clientes", label: "Clientes", icon: Users, testId: "nav-clientes" },
     { path: "/entrada", label: "Entrada", icon: FileInput, testId: "nav-entrada" },
     { path: "/revision", label: "Revisión", icon: ClipboardCheck, testId: "nav-revision" },
     { path: "/salida", label: "Salida", icon: PackageOpen, testId: "nav-salida" },
