@@ -439,10 +439,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Flujo completo de calibración y aparición en Historial y Resumen"
+    - "CRUD de clientes con gestión de departamentos"
+    - "Checkbox usar departamento como cliente en certificado"
   stuck_tasks: []
   test_all: false
-  test_priority: "critical_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
