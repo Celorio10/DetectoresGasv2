@@ -130,6 +130,7 @@ class CalibrationHistory(BaseModel):
     calibration_date: str
     technician: str
     internal_notes: str = ""  # Notas internas del técnico
+    use_department_as_client: bool = False  # Si true, usar departamento como cliente en certificado
     delivery_note: Optional[str] = None
     certificate_number: Optional[str] = None
     created_at: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
