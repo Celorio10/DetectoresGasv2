@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../Layout';
+import Layout from '../components/Layout';
 import { toast } from 'sonner';
 
 const ClientManagement = () => {
