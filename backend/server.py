@@ -325,7 +325,7 @@ async def create_model(model: Model, current_user: dict = Depends(get_current_us
 # Client routes
 @api_router.get("/clients", response_model=List[Client])
 async def get_clients(current_user: dict = Depends(get_current_user)):
-    clients = await db.clients.find({}, {"_id": 0}).to_list(1000)
+    clients = await db.clients.find({}, {"_id": 0}).sort("name", 1).to_list(1000)
     return clients
 
 @api_router.post("/clients", response_model=Client)
