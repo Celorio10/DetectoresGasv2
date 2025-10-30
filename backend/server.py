@@ -186,6 +186,7 @@ class CalibrationUpdate(BaseModel):
     calibration_date: str
     technician: str
     internal_notes: str = ""  # Notas internas del técnico (no aparecen en PDF)
+    use_department_as_client: bool = False  # Si true, usar departamento como cliente en certificado
 
 class DeliveryUpdate(BaseModel):
     serial_numbers: List[str]
