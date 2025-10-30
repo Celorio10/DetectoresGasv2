@@ -166,6 +166,8 @@ class Equipment(BaseModel):
     spare_parts: Optional[List[SparePart]] = None
     calibration_date: Optional[str] = None
     technician: Optional[str] = None
+    internal_notes: Optional[str] = ""
+    use_department_as_client: Optional[bool] = False
     delivery_note: Optional[str] = None
     delivery_location: Optional[str] = None
     delivery_date: Optional[str] = None
