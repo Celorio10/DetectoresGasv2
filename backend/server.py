@@ -336,6 +336,35 @@ async def create_client(client: Client, current_user: dict = Depends(get_current
     await db.clients.insert_one(client.model_dump())
     return client
 
+@api_router.put("/clients/{client_id}", response_model=Client)
+async def update_client(client_id: str, client: Client, current_user: dict = Depends(get_current_user)):
+    """Actualizar un cliente existente incluyendo sus departamentos"""
+    existing = await db.clients.find_one({"id": client_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    # Verificar que no haya otro cliente con el mismo CIF
+    duplicate = await db.clients.find_one({"cif": client.cif, "id": {"$ne": client_id}})
+    if duplicate:
+        raise HTTPException(status_code=400, detail="Another client with this CIF already exists")
+    
+    # Actualizar el cliente
+    await db.clients.update_one(
+        {"id": client_id},
+        {"$set": client.model_dump()}
+    )
+    return client
+
+@api_router.delete("/clients/{client_id}")
+async def delete_client(client_id: str, current_user: dict = Depends(get_current_user)):
+    """Eliminar un cliente"""
+    existing = await db.clients.find_one({"id": client_id})
+    if not existing:
+        raise HTTPException(status_code=404, detail="Client not found")
+    
+    await db.clients.delete_one({"id": client_id})
+    return {"message": "Client deleted successfully"}
+
 # Technician routes
 @api_router.get("/technicians", response_model=List[Technician])
 async def get_technicians(current_user: dict = Depends(get_current_user)):
