@@ -407,6 +407,30 @@ pdf:
         agent: "testing"
         comment: "✅ LOGO FIX VERIFIED: Workflow completo end-to-end testeado exitosamente. Cliente creado con departamento 'Seguridad Industrial', equipo Honeywell XT-1000 calibrado con 2 sensores (CO, H2S) incluyendo valores Zero/SPAN, repuesto con garantía agregado, salida registrada con delivery note, y certificado PDF generado sin errores de overflow. PDF válido de 469KB con header correcto %PDF-1.4. El fix resuelve completamente el problema reportado por el usuario."
 
+  - task: "CRUD de clientes con gestión de departamentos"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/frontend/src/pages/ClientManagement.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Backend: Agregados endpoints PUT /api/clients/{id} y DELETE /api/clients/{id}. Frontend: Nueva página ClientManagement con tabla de clientes, modal CRUD, gestión dinámica de departamentos. Ruta /clientes agregada en App.js y enlace en Layout.js"
+
+  - task: "Checkbox usar departamento como cliente en certificado"
+    implemented: true
+    working: "NA"
+    file: "/app/backend/server.py, /app/backend/pdf_generator.py, /app/frontend/src/pages/EquipmentReview.js, /app/frontend/src/pages/EquipmentHistory.js"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Backend: Campo use_department_as_client agregado a CalibrationUpdate, CalibrationHistory y Equipment models. Endpoint de calibración guarda el campo. pdf_generator.py modificado para usar departamento como CLIENTE y dejar LOCALIDAD vacía cuando el checkbox está marcado. Frontend: Checkbox agregado en EquipmentReview con texto explicativo. EquipmentHistory muestra indicador azul cuando está activo."
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
