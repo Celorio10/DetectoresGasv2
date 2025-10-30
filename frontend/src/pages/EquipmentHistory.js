@@ -363,6 +363,21 @@ export default function EquipmentHistory() {
                                     </div>
                                   )}
 
+                                  {/* Indicador de Departamento como Cliente */}
+                                  {calibration.use_department_as_client && (
+                                    <div className="mb-4 mt-4 border-t pt-4">
+                                      <div className="bg-blue-50 border border-blue-200 rounded p-3 flex items-start gap-2">
+                                        <span className="text-blue-600 font-semibold">ℹ️</span>
+                                        <div>
+                                          <p className="text-sm font-medium text-blue-900">Certificado de Cliente Intermediario</p>
+                                          <p className="text-xs text-blue-700 mt-1">
+                                            En el certificado PDF se usó el <strong>Departamento</strong> como cliente final y la <strong>Localidad</strong> quedó vacía.
+                                          </p>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )}
+
                                   {/* Estado General */}
                                   <div>
                                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getEstadoColor(calibration.calibration_data)}`}>
