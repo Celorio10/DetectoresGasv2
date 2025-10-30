@@ -634,6 +634,29 @@ export default function EquipmentReview() {
                 </p>
               </div>
 
+              {/* Checkbox para usar Departamento como Cliente en el certificado */}
+              <div className="border-t pt-6">
+                <div className="flex items-start space-x-3 bg-blue-50 p-4 rounded-lg border border-blue-200">
+                  <Checkbox
+                    id="use_department_as_client"
+                    checked={useDepartmentAsClient}
+                    onCheckedChange={setUseDepartmentAsClient}
+                    data-testid="use-department-checkbox"
+                  />
+                  <div className="flex-1">
+                    <label
+                      htmlFor="use_department_as_client"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                    >
+                      Usar nombre del Departamento como cliente final en el certificado
+                    </label>
+                    <p className="text-xs text-gray-600 mt-1">
+                      ℹ️ En casos de intermediarios: Marque esta opción para que en el certificado PDF el campo <strong>CLIENTE</strong> muestre el nombre del Departamento y el campo <strong>LOCALIDAD</strong> quede vacío.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <Label htmlFor="calibration_date">Fecha de Calibración</Label>
