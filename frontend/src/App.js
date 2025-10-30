@@ -44,6 +44,10 @@ function App() {
             element={isAuthenticated ? <EquipmentMasterCatalog /> : <Navigate to="/login" />} 
           />
           <Route 
+            path="/clientes" 
+            element={isAuthenticated ? <ClientManagement /> : <Navigate to="/login" />} 
+          />
+          <Route 
             path="/entrada" 
             element={isAuthenticated ? <EquipmentEntry /> : <Navigate to="/login" />} 
           />
