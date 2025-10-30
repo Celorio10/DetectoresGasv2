@@ -261,7 +261,8 @@ export default function EquipmentReview() {
           spare_parts: spareParts,
           calibration_date: calibrationDate,
           technician: selectedTechnician,
-          internal_notes: internalNotes
+          internal_notes: internalNotes,
+          use_department_as_client: useDepartmentAsClient
         },
         getAuthHeaders()
       );
