@@ -89,9 +89,21 @@ def generate_certificate_pdf(equipment_data, output_path):
     # Información del equipo en cajas
     info_style = ParagraphStyle('Info', parent=styles['Normal'], fontSize=9, leading=11)
     
+    # Determinar si usar departamento como cliente en el certificado
+    use_dept_as_client = equipment_data.get('use_department_as_client', False)
+    
+    if use_dept_as_client:
+        # Usar departamento como CLIENTE y dejar LOCALIDAD vacía
+        client_display = equipment_data.get('client_departamento', 'N/A')
+        locality_display = ''
+    else:
+        # Comportamiento normal: cliente en CLIENTE y departamento en LOCALIDAD
+        client_display = equipment_data.get('client_name', 'N/A')
+        locality_display = equipment_data.get('client_departamento', 'N/A')
+    
     info_data = [
-        [Paragraph("<b>CLIENTE:</b>", info_style), Paragraph(equipment_data.get('client_name', 'N/A'), info_style),
-         Paragraph("<b>LOCALIDAD:</b>", info_style), Paragraph(equipment_data.get('client_departamento', 'N/A'), info_style)],
+        [Paragraph("<b>CLIENTE:</b>", info_style), Paragraph(client_display, info_style),
+         Paragraph("<b>LOCALIDAD:</b>", info_style), Paragraph(locality_display, info_style)],
         [Paragraph("<b>EQUIPO:</b>", info_style), Paragraph(f"{equipment_data.get('brand', '')} {equipment_data.get('model', '')}", info_style),
          Paragraph("<b>No. SERIE:</b>", info_style), Paragraph(equipment_data.get('serial_number', 'N/A'), info_style)],
         [Paragraph("<b>Nº ALBARÁN:</b>", info_style), Paragraph(equipment_data.get('delivery_note', ''), info_style),
