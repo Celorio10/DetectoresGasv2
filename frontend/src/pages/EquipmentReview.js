@@ -37,6 +37,7 @@ export default function EquipmentReview() {
   const [spareParts, setSpareParts] = useState([]);
   const [newSparePart, setNewSparePart] = useState({ descripcion: "", referencia: "", garantia: false });
   const [internalNotes, setInternalNotes] = useState("");
+  const [useDepartmentAsClient, setUseDepartmentAsClient] = useState(false);
   const [calibrationDate, setCalibrationDate] = useState(new Date().toISOString().split('T')[0]);
   const [selectedTechnician, setSelectedTechnician] = useState("");
   const [newTechnician, setNewTechnician] = useState("");
