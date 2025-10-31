@@ -363,7 +363,7 @@ export default function EquipmentMasterCatalog() {
                           <SelectValue placeholder="Selecciona marca" />
                         </SelectTrigger>
                         <SelectContent>
-                          {brands.map((brand) => (
+                          {brands.filter(brand => brand.name && brand.name.trim() !== "").map((brand) => (
                             <SelectItem key={brand.id} value={brand.name}>
                               {brand.name}
                             </SelectItem>
