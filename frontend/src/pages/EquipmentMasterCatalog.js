@@ -407,7 +407,7 @@ export default function EquipmentMasterCatalog() {
                     <Label>Modelo *</Label>
                     <div className="flex gap-2">
                       <Select 
-                        value={formData.model || undefined}
+                        value={formData.model && formData.model.trim() !== "" ? formData.model : undefined}
                         onValueChange={(value) => setFormData({...formData, model: value})}
                       >
                         <SelectTrigger className="flex-1">
