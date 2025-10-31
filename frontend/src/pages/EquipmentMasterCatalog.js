@@ -162,6 +162,7 @@ export default function EquipmentMasterCatalog() {
       setSelectedClientDepartamentos(validDepartamentos);
       setFormData({
         ...formData,
+        current_client_id: clientId,
         current_client_name: client.name,
         current_client_cif: client.cif,
         current_client_departamento: ""
