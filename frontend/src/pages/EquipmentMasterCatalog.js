@@ -547,7 +547,7 @@ export default function EquipmentMasterCatalog() {
                           <SelectValue placeholder="Selecciona departamento" />
                         </SelectTrigger>
                         <SelectContent>
-                          {selectedClientDepartamentos.map((dept, idx) => (
+                          {selectedClientDepartamentos.filter(dept => dept && dept.trim() !== "").map((dept, idx) => (
                             <SelectItem key={idx} value={dept}>
                               {dept}
                             </SelectItem>
