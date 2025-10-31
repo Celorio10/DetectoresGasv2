@@ -545,7 +545,7 @@ export default function EquipmentMasterCatalog() {
                     <div>
                       <Label>Departamento</Label>
                       <Select 
-                        value={formData.current_client_departamento || undefined}
+                        value={formData.current_client_departamento && formData.current_client_departamento.trim() !== "" ? formData.current_client_departamento : undefined}
                         onValueChange={(value) => setFormData({...formData, current_client_departamento: value})}
                       >
                         <SelectTrigger>
