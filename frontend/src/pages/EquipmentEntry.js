@@ -454,7 +454,7 @@ export default function EquipmentEntry() {
                       <SelectValue placeholder="Seleccionar marca" />
                     </SelectTrigger>
                     <SelectContent>
-                      {brands.map(b => (
+                      {brands.filter(b => b.name && b.name.trim() !== "").map(b => (
                         <SelectItem key={b.id} value={b.name}>{b.name}</SelectItem>
                       ))}
                     </SelectContent>
