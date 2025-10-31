@@ -44,6 +44,7 @@ export default function EquipmentMasterCatalog() {
     serial_number: "",
     brand: "",
     model: "",
+    current_client_id: "",
     current_client_name: "",
     current_client_cif: "",
     current_client_departamento: "",
