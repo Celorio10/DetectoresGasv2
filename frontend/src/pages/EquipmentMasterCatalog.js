@@ -459,7 +459,7 @@ export default function EquipmentMasterCatalog() {
                   <div className="mb-4">
                     <Label>Cliente</Label>
                     <div className="flex gap-2">
-                      <Select value={formData.current_client_id || undefined} onValueChange={handleClientSelect}>
+                      <Select value={formData.current_client_id && formData.current_client_id.trim() !== "" ? formData.current_client_id : undefined} onValueChange={handleClientSelect}>
                         <SelectTrigger className="flex-1">
                           <SelectValue placeholder={formData.current_client_name || "Selecciona un cliente"} />
                         </SelectTrigger>
