@@ -358,7 +358,7 @@ export default function EquipmentMasterCatalog() {
                     <Label>Marca *</Label>
                     <div className="flex gap-2">
                       <Select 
-                        value={formData.brand}
+                        value={formData.brand || undefined}
                         onValueChange={(value) => setFormData({...formData, brand: value})}
                       >
                         <SelectTrigger className="flex-1">
