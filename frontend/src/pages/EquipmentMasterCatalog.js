@@ -409,7 +409,7 @@ export default function EquipmentMasterCatalog() {
                           <SelectValue placeholder="Selecciona modelo" />
                         </SelectTrigger>
                         <SelectContent>
-                          {models.map((model) => (
+                          {models.filter(model => model.name && model.name.trim() !== "").map((model) => (
                             <SelectItem key={model.id} value={model.name}>
                               {model.name}
                             </SelectItem>
