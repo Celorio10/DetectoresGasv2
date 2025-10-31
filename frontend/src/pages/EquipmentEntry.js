@@ -269,7 +269,9 @@ export default function EquipmentEntry() {
   const handleClientSelect = (clientId) => {
     const client = clients.find(c => c.id === clientId);
     if (client) {
-      setSelectedClientDepartamentos(client.departamentos || []);
+      // Filtrar departamentos vacíos
+      const validDepartamentos = (client.departamentos || []).filter(dept => dept && dept.trim() !== "");
+      setSelectedClientDepartamentos(validDepartamentos);
       setFormData({
         ...formData,
         client_name: client.name,
