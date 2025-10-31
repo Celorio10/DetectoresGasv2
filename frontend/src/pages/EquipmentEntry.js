@@ -615,7 +615,7 @@ export default function EquipmentEntry() {
                       <SelectValue placeholder="Seleccionar departamento" />
                     </SelectTrigger>
                     <SelectContent>
-                      {selectedClientDepartamentos.map((dep, index) => (
+                      {selectedClientDepartamentos.filter(dep => dep && dep.trim() !== "").map((dep, index) => (
                         <SelectItem key={index} value={dep}>{dep}</SelectItem>
                       ))}
                     </SelectContent>
