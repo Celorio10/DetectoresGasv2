@@ -492,7 +492,7 @@ export default function EquipmentEntry() {
                       <SelectValue placeholder="Seleccionar modelo" />
                     </SelectTrigger>
                     <SelectContent>
-                      {models.map(m => (
+                      {models.filter(m => m.name && m.name.trim() !== "").map(m => (
                         <SelectItem key={m.id} value={m.name}>{m.name}</SelectItem>
                       ))}
                     </SelectContent>
