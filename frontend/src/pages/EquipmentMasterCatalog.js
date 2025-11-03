@@ -549,12 +549,13 @@ export default function EquipmentMasterCatalog() {
                       <Select 
                         value={formData.current_client_departamento && formData.current_client_departamento.trim() !== "" ? formData.current_client_departamento : undefined}
                         onValueChange={(value) => setFormData({...formData, current_client_departamento: value})}
+                        disabled={selectedClientDepartamentos.length === 0}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Selecciona departamento" />
+                          <SelectValue placeholder={selectedClientDepartamentos.length === 0 ? "Sin departamentos" : "Selecciona departamento"} />
                         </SelectTrigger>
                         <SelectContent>
-                          {selectedClientDepartamentos.length > 0 && selectedClientDepartamentos.filter(dept => dept && dept.trim() !== "").map((dept, idx) => (
+                          {selectedClientDepartamentos.filter(dept => dept && dept.trim() !== "").map((dept, idx) => (
                             <SelectItem key={`dept-${idx}-${dept}`} value={dept}>
                               {dept}
                             </SelectItem>
