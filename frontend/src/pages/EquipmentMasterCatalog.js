@@ -464,7 +464,7 @@ export default function EquipmentMasterCatalog() {
                           <SelectValue placeholder={formData.current_client_name || "Selecciona un cliente"} />
                         </SelectTrigger>
                         <SelectContent>
-                          {clients.filter(client => client.name && client.name.trim() !== "").map((client) => (
+                          {clients.length > 0 && clients.filter(client => client?.name && client.name.trim() !== "").map((client) => (
                             <SelectItem key={client.id} value={client.id}>
                               {client.name} - {client.cif}
                             </SelectItem>
