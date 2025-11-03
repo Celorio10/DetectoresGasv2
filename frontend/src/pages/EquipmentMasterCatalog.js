@@ -410,12 +410,13 @@ export default function EquipmentMasterCatalog() {
                       <Select 
                         value={formData.model && formData.model.trim() !== "" ? formData.model : undefined}
                         onValueChange={(value) => setFormData({...formData, model: value})}
+                        disabled={models.length === 0}
                       >
                         <SelectTrigger className="flex-1">
-                          <SelectValue placeholder="Selecciona modelo" />
+                          <SelectValue placeholder={models.length === 0 ? "Cargando modelos..." : "Selecciona modelo"} />
                         </SelectTrigger>
                         <SelectContent>
-                          {models.length > 0 && models.filter(model => model?.name && model.name.trim() !== "").map((model) => (
+                          {models.filter(model => model?.name && model.name.trim() !== "").map((model) => (
                             <SelectItem key={model.id} value={model.name}>
                               {model.name}
                             </SelectItem>
